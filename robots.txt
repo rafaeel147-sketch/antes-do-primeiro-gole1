@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://antesdoprimeirogole1.rafaeel096.chatgpt.site/sitemap.xml

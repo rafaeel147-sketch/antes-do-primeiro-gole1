@@ -1,17 +1,19 @@
-# Antes do Primeiro Gole
+# Antes do Primeiro Gole — Site
 
-Site oficial do projeto **Antes do Primeiro Gole**, de Rafael Leandro de Carvalho.
+Versão multipágina otimizada para celular.
 
-## Publicação
+## Endereço previsto
+https://antesdoprimeirogole1.rafaeel096.chatgpt.site/
 
-O arquivo `index.html` está na raiz do repositório e pode ser publicado diretamente pelo GitHub Pages.
+## Arquivos oficiais no Google Drive
+- Livro: https://drive.google.com/file/d/1Llh5iJKoNqLA0oKeTNYAaY4tWbIhsGw2/view?usp=drive_link
+- Cartilha: https://drive.google.com/file/d/1qTAAqqTUGok_2LkOKvGAPgSkdcYpThOq/view?usp=drive_link
 
-No GitHub, abra **Settings → Pages**, escolha **Deploy from a branch**, selecione a branch `main` e a pasta `/ (root)`, depois clique em **Save**.
-
-Após a ativação, o endereço esperado é:
-
-`https://rafaeel147-sketch.github.io/antes-do-primeiro-gole1/`
-
-## Cartilha
-
-O botão da cartilha usa a versão hospedada no IdeiaSUS/Fiocruz.
+## Novidades
+- capa real do livro;
+- conceito da cartilha com portal interrompido;
+- foto do autor;
+- páginas Impacto e Empresas;
+- texto sobre ESG e incentivos culturais sem afirmar aprovação;
+- QR Code do site;
+- links diretos para os PDFs do Drive.
