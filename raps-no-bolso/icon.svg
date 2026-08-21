@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="RAPS no Bolso">
+  <rect width="512" height="512" rx="108" fill="#0b6b5f"/>
+  <rect x="82" y="82" width="348" height="348" rx="82" fill="#e5f3f0"/>
+  <path d="M236 150h40v86h86v40h-86v86h-40v-86h-86v-40h86z" fill="#0b6b5f"/>
+  <circle cx="382" cy="382" r="48" fill="#0b6b5f"/>
+  <path d="M358 382h48M382 358v48" stroke="#fff" stroke-width="12" stroke-linecap="round"/>
+</svg>
