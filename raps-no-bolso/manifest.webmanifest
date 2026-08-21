@@ -1,0 +1,19 @@
+{
+  "name": "RAPS no Bolso",
+  "short_name": "RAPS",
+  "description": "Educação, direitos e navegação no SUS e na RAPS.",
+  "lang": "pt-BR",
+  "start_url": "./#/",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f4f7f6",
+  "theme_color": "#0b6b5f",
+  "icons": [
+    {
+      "src": "./icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
