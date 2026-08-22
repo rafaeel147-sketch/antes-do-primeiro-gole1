@@ -1,5 +1,5 @@
-const CACHE='raps-no-bolso-v7';
-const CORE=['./','./index.html','./app.css','./participation.css','./app.js','./rights-addon.js','./rights-2026-addon.js','./rights-child-mental-2026-addon.js','./alcohol-drugs-addon.js','./participation-addon.js','./route-refresh.js','./manifest.webmanifest','./icon.svg'];
+const CACHE='raps-no-bolso-v8';
+const CORE=['./','./index.html','./app.css','./participation.css','./app.js','./rights-addon.js','./rights-2026-addon.js','./rights-child-mental-2026-addon.js','./alcohol-drugs-addon.js','./participation-addon.js','./participation-status-addon.js','./route-refresh.js','./manifest.webmanifest','./icon.svg'];
 self.addEventListener('install',event=>{event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(CORE)).then(()=>self.skipWaiting()))});
 self.addEventListener('activate',event=>{event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim()))});
 self.addEventListener('fetch',event=>{
