@@ -1,0 +1,12 @@
+.path-choice{width:100%;text-align:left;font:inherit;color:inherit;border:0;cursor:pointer;background:var(--card,#fff)}
+.path-choice.selected{outline:3px solid color-mix(in srgb, currentColor 18%, transparent);outline-offset:2px}
+.path-result-wrap{scroll-margin-top:88px;margin-top:18px}
+.path-result{outline:none}
+.path-service{display:grid;gap:4px;padding:14px 16px;border-radius:14px;background:rgba(255,255,255,.58);margin:12px 0}
+.path-service.secondary{background:rgba(255,255,255,.38)}
+.path-service small{font-weight:700;text-transform:uppercase;letter-spacing:.05em;opacity:.72}
+.path-service strong{font-size:1.06rem}
+.path-disclaimer{font-size:.94rem;opacity:.86;border-top:1px solid rgba(0,0,0,.08);padding-top:12px;margin-top:16px}
+.path-safety .hero-actions{margin-top:12px}
+@media (prefers-reduced-motion: reduce){.path-result-wrap{scroll-behavior:auto}}
+.high-contrast .path-choice.selected{outline:3px solid currentColor}
