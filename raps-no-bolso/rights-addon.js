@@ -50,7 +50,7 @@ pages.direitos = () => `
           <ul class="law-list">
             <li><strong>Sem Cartão SUS:</strong> a Portaria GM/MS nº 940/2011, art. 13, afirma expressamente que inexistência, ausência ou desconhecimento do número do Cartão Nacional de Saúde <strong>não impedem o atendimento solicitado</strong>.</li>
             <li><strong>Cadastro pode vir depois:</strong> a própria Portaria permite que as atividades de identificação e cadastramento sejam feitas posteriormente ao atendimento.</li>
-            <li><strong>Outros documentos:</strong> em urgência e emergência, exigência cadastral não pode virar barreira para receber e cuidar. Fora dessas situações, o serviço pode solicitar dados/documentos necessários para organizar cadastro e continuidade do cuidado.</li>
+            <li><strong>Sem documento de identificação:</strong> a norma acima trata expressamente do Cartão SUS, não de todo documento civil. Porém, em urgência e emergência, a Carta dos Direitos determina que qualquer serviço receba e cuide da pessoa e que o acolhimento não seja bloqueado por procedimentos burocráticos. Fora dessas situações, o serviço pode solicitar dados e documentos necessários ao cadastro e à continuidade do cuidado.</li>
           </ul>
           <div class="panel soft" style="margin-top:14px"><strong>Como pedir:</strong> “Estou sem o Cartão SUS agora. A Portaria nº 940/2011, art. 13, diz que isso não impede o atendimento. O cadastro pode ser regularizado depois.”</div>
         </section>
