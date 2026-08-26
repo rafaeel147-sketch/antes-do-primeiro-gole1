@@ -54,7 +54,7 @@
           required: ['check_id','status','note'],
           additionalProperties: false
         },
-        annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: true },
+        annotations: { readOnlyHint: false },
         execute: async ({ check_id, status, note }) => {
           const state = CEPVState.loadState();
           CEPVState.recordCheck(state, { checkId: check_id, status, note });
@@ -77,7 +77,7 @@
           required: ['run','summary','evidence','severity'],
           additionalProperties: false
         },
-        annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: false },
+        annotations: { readOnlyHint: false },
         execute: async ({ run, check_id, summary, evidence, severity }) => {
           const state = CEPVState.loadState();
           const finding = CEPVState.submitFinding(state, { run, checkId: check_id, summary, evidence, severity }, 'agent');
