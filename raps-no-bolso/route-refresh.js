@@ -1,10 +1,19 @@
 // Reprocessa a rota depois que todos os módulos adicionais foram carregados.
 // Isso permite abrir diretamente URLs de módulos adicionados após o app principal.
-(function loadFase4SafeAddon(){
-  const finish = () => render(currentRoute(), false);
-  const script = document.createElement('script');
-  script.src = './fase4-safe-addon.js';
-  script.onload = finish;
-  script.onerror = finish;
-  document.body.appendChild(script);
+(function loadPostAppAddons(){
+  const scripts = ['./fase4-safe-addon.js','./services-goiania-addon.js'];
+
+  function loadNext(index){
+    if(index >= scripts.length){
+      render(currentRoute(), false);
+      return;
+    }
+    const script = document.createElement('script');
+    script.src = scripts[index];
+    script.onload = () => loadNext(index + 1);
+    script.onerror = () => loadNext(index + 1);
+    document.body.appendChild(script);
+  }
+
+  loadNext(0);
 })();
