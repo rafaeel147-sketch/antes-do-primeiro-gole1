@@ -1,0 +1,55 @@
+name: RAPS proximity browser smoke
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'raps-no-bolso/**'
+      - '.github/scripts/raps-proximity-smoke.mjs'
+      - '.github/workflows/raps-proximity-smoke.yml'
+  push:
+    branches:
+      - 'fix/raps-*'
+    paths:
+      - 'raps-no-bolso/**'
+      - '.github/scripts/raps-proximity-smoke.mjs'
+      - '.github/workflows/raps-proximity-smoke.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  proximity-browser:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Playwright Chromium
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm install --no-save --package-lock=false playwright@1.55.0
+          npx playwright install --with-deps chromium
+
+      - name: Run proximity browser smoke
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -m http.server 4173 --bind 127.0.0.1 --directory . >/tmp/raps-http.log 2>&1 &
+          SERVER_PID=$!
+          trap 'kill "$SERVER_PID" 2>/dev/null || true' EXIT
+          for attempt in {1..20}; do
+            if curl -fsS http://127.0.0.1:4173/raps-no-bolso/ >/dev/null; then
+              break
+            fi
+            sleep 1
+          done
+          curl -fsS http://127.0.0.1:4173/raps-no-bolso/ >/dev/null
+          node .github/scripts/raps-proximity-smoke.mjs
