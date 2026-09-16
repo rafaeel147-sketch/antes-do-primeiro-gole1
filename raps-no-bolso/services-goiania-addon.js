@@ -1,9 +1,10 @@
-// Diretório local RAPS/urgência de Goiânia — verificado em fontes oficiais em 12/09/2026.
+// Diretório local RAPS/urgência de Goiânia — verificado em fontes oficiais em 16/09/2026.
 // GPS é opcional, acionado pelo usuário e mantido apenas em memória nesta página.
 (function servicesGoianiaAddon(){
-  const VERIFIED_AT = '12/09/2026';
+  const VERIFIED_AT = '16/09/2026';
   const CAPS_SOURCE = 'https://saude.goiania.go.gov.br/sobre-a-secretaria/consultas-sus/centros-de-atencao-psicossocial-caps/';
   const UPA_SOURCE = 'https://www.goiania.go.gov.br/sing_servicos/unidade-de-pronto-atendimento-upas-24-horas/';
+  const URGENCY_SOURCE = 'https://www.goiania.go.gov.br/urgenciaemergencia/';
 
   const services = [
     {name:'CAPSi Água Viva', type:'caps-infanto', label:'CAPSi', audience:'Crianças e adolescentes; saúde mental, violência e álcool/outras drogas.', hours:'Seg a sex, 07h–19h', address:'Rua C 88, QD. 164, LT. 14, Setor Sudoeste, Goiânia - GO', phone:'6232025680', displayPhone:'(62) 3202-5680', source:CAPS_SOURCE},
@@ -22,7 +23,8 @@
     {name:'Pronto Socorro Psiquiátrico Professor Wassily Chuc', type:'urgencia', label:'Urgência psiquiátrica 24h', audience:'Situações de crise em saúde mental.', hours:'Todos os dias, 24h', address:'Avenida C 107, nº 3642, Jardim América, Goiânia - GO, CEP 74205-095', phone:'6230304124', displayPhone:'(62) 3030-4124', source:CAPS_SOURCE, open24:true},
     {name:'UPA Itaipu — Dr. João Batista de Sousa Júnior', type:'upa', label:'UPA 24h', audience:'Urgências e emergências clínicas; acolhimento com classificação de risco.', hours:'Todos os dias, 24h', address:'Avenida Rio Vermelho esquina com R-I-19, QD. 14, Residencial Itaipu, Goiânia - GO', phone:'6232583745', displayPhone:'(62) 3258-3745', source:UPA_SOURCE, open24:true},
     {name:'UPA Noroeste — Maria Pires Perillo', type:'upa', label:'UPA 24h', audience:'Urgências e emergências clínicas; acolhimento com classificação de risco.', hours:'Todos os dias, 24h', address:'Rua JC-22 com JC-27 e 27-A, s/nº, Jardim Curitiba I, Goiânia - GO', phone:'6235243460', displayPhone:'(62) 3524-3460', source:UPA_SOURCE, open24:true},
-    {name:'UPA Jardim América — Dr. Domingos Viggiano', type:'upa', label:'UPA 24h', audience:'Urgências e emergências clínicas; acolhimento com classificação de risco.', hours:'Todos os dias, 24h', address:'Praça C-201, Jardim América, Goiânia - GO, CEP 74175-120', phone:'', displayPhone:'Telefone não publicado na página oficial consultada', source:UPA_SOURCE, open24:true}
+    {name:'UPA Chácara do Governador — Dr. Paulo de Siqueira Garcia', type:'upa', label:'UPA 24h', audience:'Urgências e emergências clínicas; acolhimento com classificação de risco.', hours:'Todos os dias, 24h', address:'Rua DF-2 com Rua DF-18, Lote 14, Chácara do Governador, Goiânia - GO, CEP 74485-150', phone:'', displayPhone:'Consulte a fonte oficial para contato atualizado', source:URGENCY_SOURCE, open24:true},
+    {name:'UPA Jardim América — Dr. Domingos Viggiano', type:'upa', label:'UPA 24h', audience:'Urgências e emergências clínicas; acolhimento com classificação de risco.', hours:'Todos os dias, 24h', address:'Praça C-201, Jardim América, Goiânia - GO', phone:'', displayPhone:'Telefone não consolidado nas fontes oficiais consultadas', source:URGENCY_SOURCE, open24:true}
   ];
 
   let deviceLocation = null;
@@ -142,7 +144,7 @@
       </section>
 
       <div id="serviceResults" class="service-results">${services.map(serviceCard).join('')}</div>
-      <section class="panel soft"><h2>Sobre atualização</h2><p>Endereços, telefones e horários podem mudar. Por isso cada serviço aponta para a fonte oficial e o diretório mostra a data da última conferência. UBSs ainda não foram incluídas nesta primeira etapa porque a rede de Atenção Primária é muito maior e merece importação/verificação própria.</p></section>
+      <section class="panel soft"><h2>Sobre atualização</h2><p>Endereços, telefones, nomenclaturas e horários podem mudar. Fontes oficiais do próprio Município podem divergir; por isso o diretório mostra a data da última conferência e não inventa uma classificação quando as fontes não são consistentes. As UBSs ficam em um diretório próprio dentro do RAPS no Bolso.</p><div class="hero-actions">${link('ubs-goiania','Abrir UBS em Goiânia','btn secondary')}<a class="btn secondary" href="${URGENCY_SOURCE}" target="_blank" rel="noopener noreferrer">Urgência — fonte oficial ↗</a></div></section>
     </div>`;
 
   if (!document.getElementById('servicesGoianiaStyles')) {
