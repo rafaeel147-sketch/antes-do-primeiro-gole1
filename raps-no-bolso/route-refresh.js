@@ -1,7 +1,7 @@
 // Reprocessa a rota depois que todos os módulos adicionais foram carregados.
 // Isso permite abrir diretamente URLs de módulos adicionados após o app principal.
 (function loadPostAppAddons(){
-  const scripts = ['./fase4-safe-addon.js','./services-goiania-addon.js','./ubs-goiania-addon.js'];
+  const scripts = ['./fase4-safe-addon.js','./services-goiania-addon.js','./ubs-goiania-addon.js','./proximity-addon.js'];
   const failedScripts = [];
 
   function finishLoading(){
