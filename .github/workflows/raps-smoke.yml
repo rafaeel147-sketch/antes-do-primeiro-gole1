@@ -108,12 +108,14 @@ jobs:
           grep -Fq "rapsAddonLoadError" raps-no-bolso/route-refresh.js
           grep -Fq "Falha ao carregar addon" raps-no-bolso/route-refresh.js
 
-      - name: Check mobile accessibility controls
+      - name: Check mobile accessibility controls and header
         shell: bash
         run: |
           set -euo pipefail
           grep -Fq 'id="fontDown"' raps-no-bolso/index.html
           grep -Fq 'id="fontUp"' raps-no-bolso/index.html
+          grep -Fq 'aria-label="RAPS no Bolso — início"' raps-no-bolso/index.html
+          grep -Fq '.brand>span:last-child{display:none}' raps-no-bolso/app.css
           ! grep -Fq '.a11y-actions button:first-child{display:none}' raps-no-bolso/app.css
 
       - name: Check current Goiânia urgent directory findings
