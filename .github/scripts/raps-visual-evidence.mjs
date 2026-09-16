@@ -23,31 +23,37 @@ async function goto(route = '') {
   await page.waitForSelector('#speakPage');
 }
 
+async function capture(name, fullPage = true) {
+  await page.evaluate(() => window.scrollTo(0, 0));
+  await page.waitForTimeout(100);
+  await page.screenshot({ path: `${OUT}/${name}`, fullPage });
+}
+
 await goto();
-await page.screenshot({ path: `${OUT}/01-home-mobile.png`, fullPage: true });
+await capture('01-home-mobile.png');
 
 await page.click('#menuButton');
 await page.waitForSelector('#drawer.open');
-await page.screenshot({ path: `${OUT}/02-menu-mobile.png`, fullPage: false });
+await capture('02-menu-mobile.png', false);
 await page.click('#closeMenu');
 
 await page.click('#contrast');
-await page.screenshot({ path: `${OUT}/03-high-contrast-mobile.png`, fullPage: true });
+await capture('03-high-contrast-mobile.png');
 await page.click('#contrast');
 
 await goto('direitos-atendimento');
-await page.screenshot({ path: `${OUT}/04-direitos-cpf-cns.png`, fullPage: true });
+await capture('04-direitos-cpf-cns.png');
 
 await goto('servicos-goiania');
 await page.selectOption('#serviceType', 'upa');
 await page.click('#useLocation');
 await page.waitForFunction(() => document.getElementById('useLocation')?.textContent?.includes('Localização ativada'));
-await page.screenshot({ path: `${OUT}/05-servicos-upa-gps.png`, fullPage: true });
+await capture('05-servicos-upa-gps.png');
 
 await goto('ubs-goiania');
 await page.fill('#ubsSearch', 'Estrela Dalva');
 await page.waitForTimeout(150);
-await page.screenshot({ path: `${OUT}/06-ubs-estrela-dalva.png`, fullPage: true });
+await capture('06-ubs-estrela-dalva.png');
 
 await context.close();
 await browser.close();
