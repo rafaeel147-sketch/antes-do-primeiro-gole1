@@ -86,6 +86,17 @@ check((await page.locator('h1').first().innerText()).includes('Estou com abstin�
 await goto('ad-abstinencia');
 check((await page.locator('h1').first().innerText()).includes('Estou com abstinência'), 'rota canônica ad-abstinencia funciona');
 
+await goto('direitos-atendimento');
+const rightsText = await page.locator('#conteudo').innerText();
+check(rightsText.includes('Não possuir ou não portar documento com o número do CPF ou CNS não é, por si só, impedimento ao atendimento.'), 'página de direitos renderiza a regra atual de CPF/CNS');
+check(rightsText.includes('art. 258'), 'página de direitos renderiza a ressalva do art. 258');
+check(!rightsText.includes('Portaria GM/MS nº 940/2011, art. 13'), 'página final de direitos não exibe mais a orientação antiga da Portaria 940/2011');
+
+await goto('onde-ajuda');
+const helpText = await page.locator('#conteudo').innerText();
+check(helpText.includes('Sem o número do CPF/CNS?'), 'Onde buscar ajuda usa o cabeçalho atualizado de CPF/CNS');
+check(helpText.includes('outro documento válido'), 'Onde buscar ajuda renderiza a regra atual de identificação');
+
 await goto('servicos-goiania');
 await page.waitForSelector('#serviceResults');
 check((await page.locator('#serviceResults').innerText()).includes('UPA Chácara do Governador'), 'diretório inclui UPA Chácara do Governador');
