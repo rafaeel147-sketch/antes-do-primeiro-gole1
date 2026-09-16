@@ -71,6 +71,43 @@ jobs:
           ! grep -Fq "'alcool-ajuda'" raps-no-bolso/care-path-addon.js
           ! grep -Fq "'alcool-abstinencia'" raps-no-bolso/care-path-addon.js
 
+      - name: Check canonical abstinence route
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -Fq "pages.abstinencia = () => pages['ad-abstinencia']();" raps-no-bolso/fase4-safe-addon.js
+          ! grep -Fq "fase4InsertAfter('alcool-drogas', ['abstinencia'" raps-no-bolso/fase4-safe-addon.js
+          grep -Fq "pages['ad-abstinencia']" raps-no-bolso/alcohol-drugs-addon.js
+
+      - name: Check deterministic CPF CNS rights update
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -Fq "pages['direitos-atendimento'] = () =>" raps-no-bolso/fase4-safe-addon.js
+          grep -Fq "pages['onde-ajuda'] = () =>" raps-no-bolso/fase4-safe-addon.js
+          grep -Fq "rightsSources.cartao = fase4Sources.identificacao" raps-no-bolso/fase4-safe-addon.js
+          grep -Fq "Não possuir ou não portar documento com o número do CPF ou CNS não é, por si só, impedimento" raps-no-bolso/fase4-safe-addon.js
+          grep -Fq "art. 258" raps-no-bolso/fase4-safe-addon.js
+          ! grep -Fq "function fase4CorrigirIdentificacao" raps-no-bolso/fase4-safe-addon.js
+
+      - name: Check GPS privacy disclosure
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -Fq "GPS opcional para rotas" raps-no-bolso/evaluation-privacy-addon.js
+          grep -Fq "O RAPS no Bolso não grava essa posição" raps-no-bolso/evaluation-privacy-addon.js
+          grep -Fq "A localização é opcional e só é solicitada" raps-no-bolso/fase4-safe-addon.js
+          grep -Fq "navigator.geolocation" raps-no-bolso/services-goiania-addon.js
+          grep -Fq "navigator.geolocation" raps-no-bolso/ubs-goiania-addon.js
+
+      - name: Check addon load failure observability
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -Fq "window.__rapsAddonLoadFailures" raps-no-bolso/route-refresh.js
+          grep -Fq "rapsAddonLoadError" raps-no-bolso/route-refresh.js
+          grep -Fq "Falha ao carregar addon" raps-no-bolso/route-refresh.js
+
       - name: Check Goiânia primary care directory
         shell: bash
         run: |
