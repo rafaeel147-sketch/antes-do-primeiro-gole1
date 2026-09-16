@@ -30,6 +30,10 @@ async function capture(name, fullPage = true) {
 }
 
 await goto();
+const sectionHeadDirection = await page.locator('.section-head').evaluate(el => getComputedStyle(el).flexDirection);
+if (sectionHeadDirection !== 'column') {
+  throw new Error(`section-head mobile deveria ser column; recebido: ${sectionHeadDirection}`);
+}
 await capture('01-home-mobile.png');
 
 await page.click('#menuButton');
