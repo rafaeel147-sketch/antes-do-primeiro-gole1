@@ -116,6 +116,16 @@ jobs:
           grep -Fq 'id="fontUp"' raps-no-bolso/index.html
           ! grep -Fq '.a11y-actions button:first-child{display:none}' raps-no-bolso/app.css
 
+      - name: Check current Goiânia urgent directory findings
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -Fq "UPA Chácara do Governador — Dr. Paulo de Siqueira Garcia" raps-no-bolso/services-goiania-addon.js
+          grep -Fq "https://www.goiania.go.gov.br/urgenciaemergencia/" raps-no-bolso/services-goiania-addon.js
+          grep -Fq "16/09/2026" raps-no-bolso/services-goiania-addon.js
+          grep -Fq "As UBSs ficam em um diretório próprio" raps-no-bolso/services-goiania-addon.js
+          ! grep -Fq "UBSs ainda não foram incluídas" raps-no-bolso/services-goiania-addon.js
+
       - name: Check Goiânia primary care directory
         shell: bash
         run: |
