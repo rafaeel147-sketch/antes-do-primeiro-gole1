@@ -57,6 +57,20 @@ jobs:
           grep -Fq "./ubs-goiania-addon.js" raps-no-bolso/sw.js
           grep -Fq "raps-no-bolso-v14" raps-no-bolso/sw.js
 
+      - name: Check Encontre o caminho route integrity
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -Fq "pages['ad-recaida']" raps-no-bolso/alcohol-drugs-addon.js
+          grep -Fq "pages['ad-abstinencia']" raps-no-bolso/alcohol-drugs-addon.js
+          grep -Fq "pages['ad-ajuda']" raps-no-bolso/alcohol-drugs-addon.js
+          grep -Fq "['ad-recaida','O que fazer depois de uma recaída']" raps-no-bolso/care-path-addon.js
+          grep -Fq "['ad-ajuda','Onde procurar ajuda']" raps-no-bolso/care-path-addon.js
+          grep -Fq "['ad-abstinencia','Entender abstinência e sinais de alerta']" raps-no-bolso/care-path-addon.js
+          ! grep -Fq "'alcool-recaida'" raps-no-bolso/care-path-addon.js
+          ! grep -Fq "'alcool-ajuda'" raps-no-bolso/care-path-addon.js
+          ! grep -Fq "'alcool-abstinencia'" raps-no-bolso/care-path-addon.js
+
       - name: Check Goiânia primary care directory
         shell: bash
         run: |
