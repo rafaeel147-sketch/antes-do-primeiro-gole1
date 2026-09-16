@@ -6,12 +6,14 @@ on:
     paths:
       - 'raps-no-bolso/**'
       - '.github/workflows/raps-smoke.yml'
+      - '.github/scripts/raps-browser-smoke.mjs'
   push:
     branches:
       - 'fix/raps-*'
     paths:
       - 'raps-no-bolso/**'
       - '.github/workflows/raps-smoke.yml'
+      - '.github/scripts/raps-browser-smoke.mjs'
   workflow_dispatch:
 
 permissions:
@@ -44,6 +46,7 @@ jobs:
           test -f raps-no-bolso/ubs-goiania-addon.js
           test -f raps-no-bolso/route-refresh.js
           test -f raps-no-bolso/sw.js
+          test -f .github/scripts/raps-browser-smoke.mjs
 
       - name: Check addon loading and offline cache
         shell: bash
@@ -144,3 +147,38 @@ jobs:
           set -euo pipefail
           grep -Rq "tel:192" raps-no-bolso/*.js
           grep -Rq "tel:136" raps-no-bolso/*.js
+
+  browser-smoke:
+    needs: smoke
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Playwright Chromium
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm install --no-save --package-lock=false playwright@1.55.0
+          npx playwright install --with-deps chromium
+
+      - name: Run functional browser smoke
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -m http.server 4173 --bind 127.0.0.1 --directory . >/tmp/raps-http.log 2>&1 &
+          SERVER_PID=$!
+          trap 'kill "$SERVER_PID" 2>/dev/null || true' EXIT
+          for attempt in {1..20}; do
+            if curl -fsS http://127.0.0.1:4173/raps-no-bolso/ >/dev/null; then
+              break
+            fi
+            sleep 1
+          done
+          curl -fsS http://127.0.0.1:4173/raps-no-bolso/ >/dev/null
+          node .github/scripts/raps-browser-smoke.mjs
