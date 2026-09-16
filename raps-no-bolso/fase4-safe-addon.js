@@ -17,7 +17,6 @@ function fase4InsertAfter(route, item) {
   else menuItems.push(item);
 }
 
-fase4InsertAfter('alcool-drogas', ['abstinencia','⚠','Abstinência','Sinais de alerta e quando procurar avaliação urgente.']);
 fase4InsertAfter('ouvsus', ['lai-sic','📄','LAI / SIC','Como pedir documentos e informações públicas.']);
 
 // Corrige a regra documental antiga sem apagar o restante do módulo de direitos.
@@ -54,44 +53,11 @@ if (typeof pages['onde-ajuda'] === 'function') {
   );
 }
 
-pages.abstinencia = () => `
-  <div class="page">
-    ${emergencyStrip()}
-    ${pageHead('Abstinência','Reduzir ou interromper o uso de álcool pode provocar sintomas. Em algumas pessoas, a abstinência pode ser grave e precisa de avaliação profissional.','Álcool e outras drogas')}
-    <div class="content-grid">
-      <div class="content-stack">
-        <section class="panel danger">
-          <h2>Quando a abstinência pode ser perigosa</h2>
-          <p>O Ministério da Saúde informa que a redução repentina do álcool pode resultar em abstinência grave em pessoas com uso pesado e prolongado. Convulsões, confusão ou desorientação, alucinações, agitação intensa, alteração importante de consciência ou piora rápida exigem avaliação urgente.</p>
-          <div class="hero-actions"><a class="btn danger" href="tel:192">Ligar 192</a>${link('onde-ajuda','Ver portas de urgência','btn secondary')}</div>
-        </section>
-        <section class="panel">
-          <h2>Sinais que merecem atenção</h2>
-          <ul class="tip-list">
-            <li>Tremores, suor intenso, náusea, ansiedade e aumento importante dos batimentos podem aparecer após reduzir ou interromper o álcool.</li>
-            <li>Histórico de convulsão ou delirium em abstinências anteriores aumenta a preocupação.</li>
-            <li>Outras doenças clínicas ou psiquiátricas, falta de apoio social e tentativas anteriores complicadas também podem aumentar o risco.</li>
-          </ul>
-        </section>
-        <section class="panel warning">
-          <h2>Não transforme esta página em um plano de desintoxicação</h2>
-          <p>Se o uso é frequente ou intenso, ou se você já teve abstinência importante, é mais seguro procurar avaliação antes de fazer uma interrupção brusca sozinho. Este aplicativo não orienta dose, esquema de remédio ou automedicação.</p>
-        </section>
-        <section class="panel">
-          <h2>Onde procurar</h2>
-          <ul class="law-list">
-            <li><strong>UBS:</strong> pode fazer avaliação inicial e articular continuidade do cuidado conforme a gravidade.</li>
-            <li><strong>CAPS AD:</strong> acolhe necessidades relacionadas ao uso de álcool e outras drogas e pode construir cuidado sem exigir abstinência como condição de entrada.</li>
-            <li><strong>UPA, pronto-socorro ou SAMU 192:</strong> quando houver sinais de gravidade, risco ou piora rápida.</li>
-          </ul>
-        </section>
-      </div>
-      <div class="side-stack">
-        ${sideBox('Relacionado','Se sua meta é reduzir riscos ou mudar o padrão de uso, veja também o conteúdo de álcool e outras drogas.',[['alcool-drogas','Álcool e outras drogas'],['reducao-danos','Redução de danos']])}
-        <section class="panel"><h3>Fonte oficial</h3>${sourceList([fase4Sources.abstinencia])}</section>
-      </div>
-    </div>
-  </div>`;
+// Uma única fonte de verdade para abstinência: a rota canônica do módulo AOD.
+// O alias legado é mantido apenas para não quebrar links antigos já compartilhados.
+if (typeof pages['ad-abstinencia'] === 'function') {
+  pages.abstinencia = () => pages['ad-abstinencia']();
+}
 
 pages['lai-sic'] = () => `
   <div class="page">
