@@ -14,6 +14,12 @@ function check(condition, message) {
   }
 }
 
+function recordFailure(message, error) {
+  const detail = `${message}: ${error?.message || error}`;
+  failures.push(detail);
+  console.error(`FAIL: ${detail}`);
+}
+
 const browser = await chromium.launch({ headless: true });
 const context = await browser.newContext({
   viewport: { width: 390, height: 844 },
@@ -105,6 +111,58 @@ const addonFailures = await page.evaluate(() => window.__rapsAddonLoadFailures |
 check(Array.isArray(addonFailures) && addonFailures.length === 0, 'nenhum addon falhou ao carregar no navegador');
 check(runtimeErrors.length === 0, `nenhum erro JavaScript/console ocorreu (${runtimeErrors.join(' | ') || '0 erros'})`);
 
+try {
+  await page.evaluate(() => navigator.serviceWorker.ready.then(() => true));
+  if (!(await page.evaluate(() => Boolean(navigator.serviceWorker.controller)))) {
+    await page.reload({ waitUntil: 'networkidle' });
+  }
+  check(await page.evaluate(() => Boolean(navigator.serviceWorker.controller)), 'service worker controla a página antes do teste offline');
+  await context.setOffline(true);
+  await page.goto(`${BASE}?p=ad-abstinencia`, { waitUntil: 'domcontentloaded' });
+  await page.waitForSelector('h1');
+  check((await page.locator('h1').first().innerText()).includes('Estou com abstinência'), 'rota principal continua disponível offline pelo service worker');
+  await context.setOffline(false);
+} catch (error) {
+  await context.setOffline(false).catch(() => {});
+  recordFailure('PWA offline não passou no Chromium', error);
+}
+
+const deniedContext = await browser.newContext({ viewport: { width: 390, height: 844 } });
+try {
+  await deniedContext.clearPermissions();
+  const deniedPage = await deniedContext.newPage();
+  await deniedPage.goto(`${BASE}?p=servicos-goiania`, { waitUntil: 'networkidle' });
+  await deniedPage.waitForSelector('#useLocation');
+  await deniedPage.click('#useLocation');
+  await deniedPage.waitForFunction(() => document.getElementById('locationStatus')?.dataset.state === 'error');
+  const deniedText = await deniedPage.locator('#locationStatus').innerText();
+  check(deniedText.includes('Permissão de localização negada'), 'GPS negado mantém o diretório utilizável e informa a recusa');
+  check(await deniedPage.locator('#serviceResults .service-card').count() > 0, 'serviços continuam visíveis com GPS negado');
+} catch (error) {
+  recordFailure('Cenário de GPS negado não passou no Chromium', error);
+} finally {
+  await deniedContext.close();
+}
+
+const unavailableContext = await browser.newContext({ viewport: { width: 390, height: 844 } });
+try {
+  const unavailablePage = await unavailableContext.newPage();
+  await unavailablePage.addInitScript(() => {
+    Object.defineProperty(navigator, 'geolocation', { value: undefined, configurable: true });
+  });
+  await unavailablePage.goto(`${BASE}?p=servicos-goiania`, { waitUntil: 'networkidle' });
+  await unavailablePage.waitForSelector('#useLocation');
+  await unavailablePage.click('#useLocation');
+  const unavailableText = await unavailablePage.locator('#locationStatus').innerText();
+  check(unavailableText.includes('não oferece geolocalização'), 'navegador sem geolocalização recebe fallback explícito');
+  check(await unavailablePage.locator('#serviceResults .service-card').count() > 0, 'diretório funciona sem API de geolocalização');
+} catch (error) {
+  recordFailure('Cenário sem API de geolocalização não passou no Chromium', error);
+} finally {
+  await unavailableContext.close();
+}
+
+await context.close();
 await browser.close();
 
 if (failures.length) {
