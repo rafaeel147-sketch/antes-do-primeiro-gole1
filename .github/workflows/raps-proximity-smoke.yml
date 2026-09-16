@@ -31,6 +31,32 @@ jobs:
         with:
           node-version: '20'
 
+      - name: Probe live CNES coordinate source (non-blocking)
+        continue-on-error: true
+        shell: bash
+        run: |
+          node <<'NODE'
+          const resource = '7559175a-98ac-4719-bf30-5e6455ba57c5';
+          const sql = `SELECT cnes, latitude, longitude, municipio FROM "${resource}" WHERE cnes='2506386'`;
+          const url = 'https://dadosabertos.go.gov.br/pt_BR/api/3/action/datastore_search_sql?sql=' + encodeURIComponent(sql);
+          const controller = new AbortController();
+          const timeout = setTimeout(() => controller.abort(), 10000);
+          try {
+            const response = await fetch(url, { signal: controller.signal, headers: { accept: 'application/json' } });
+            if (!response.ok) throw new Error(`HTTP ${response.status}`);
+            const payload = await response.json();
+            const record = payload?.result?.records?.[0];
+            const lat = Number(String(record?.latitude ?? '').replace(',', '.'));
+            const lng = Number(String(record?.longitude ?? '').replace(',', '.'));
+            if (!record || !Number.isFinite(lat) || !Number.isFinite(lng)) throw new Error('registro sem latitude/longitude válidas');
+            console.log(`LIVE_GEO_SOURCE_OK CNES=${record.cnes} municipio=${record.municipio} lat=${lat} lng=${lng}`);
+          } catch (error) {
+            console.warn(`LIVE_GEO_SOURCE_WARN ${error?.message || error}`);
+          } finally {
+            clearTimeout(timeout);
+          }
+          NODE
+
       - name: Install Playwright Chromium
         shell: bash
         run: |
