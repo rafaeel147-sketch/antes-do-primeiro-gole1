@@ -10,6 +10,7 @@ on:
       - '.github/scripts/raps-visual-evidence.mjs'
   push:
     branches:
+      - main
       - 'fix/raps-*'
     paths:
       - 'raps-no-bolso/**'
