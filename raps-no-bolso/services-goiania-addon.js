@@ -106,7 +106,7 @@
   // Entrada própria no menu, logo depois de "Onde buscar ajuda".
   if (!menuItems.some(([route]) => route === 'servicos-goiania')) {
     const idx = menuItems.findIndex(([route]) => route === 'onde-ajuda');
-    menuItems.splice(idx >= 0 ? idx + 1 : menuItems.length, 0, ['servicos-goiania','⌖','Serviços em Goiânia','CAPS, urgência e rotas com GPS opcional']);
+    menuItems.splice(idx >= 0 ? idx + 1 : menuItems.length, 0, ['servicos-goiania','🏥','Serviços em Goiânia','CAPS, urgência e rotas com GPS opcional']);
   }
 
   pages['servicos-goiania'] = () => `
