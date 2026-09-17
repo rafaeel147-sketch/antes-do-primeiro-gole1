@@ -77,7 +77,7 @@ const filteredExact = await page.locator('#ubsResults .service-card a', { hasTex
 assert.equal(filteredExact, '1', 'ranking exato deve sobreviver ao re-render dos filtros');
 
 await page.goto(`${BASE}?p=servicos-goiania`, { waitUntil: 'networkidle' });
-await page.waitForFunction(() => Boolean(window.__rapsProximity));
+await page.waitForFunction(() => Boolean(window.__rapsProximity) && Boolean(window.__rapsServiceProximity));
 await page.waitForFunction(() => document.querySelector('#serviceResults .service-card a[data-route-query-strengthened="1"]'));
 const serviceRoute = await page.locator('#serviceResults .service-card').first().evaluate(card => {
   const name = card.querySelector('h3')?.textContent?.trim() || '';
@@ -85,6 +85,41 @@ const serviceRoute = await page.locator('#serviceResults .service-card').first()
   return { name, destination: new URL(link.href).searchParams.get('destination') || '' };
 });
 assert.ok(serviceRoute.destination.includes(serviceRoute.name), 'rota de CAPS/UPA deve usar nome + endereço para reduzir ambiguidade');
+
+await page.selectOption('#serviceType', 'upa');
+await page.waitForFunction(() => document.querySelectorAll('#serviceResults .service-card').length === 4);
+await page.evaluate(() => {
+  window.__rapsServiceProximityTestCoordinates = {
+    '7304188': { lat: -16.7900, lng: -49.3800, municipio: 'GOIANIA' },
+    '7821379': { lat: -16.6871, lng: -49.2650, municipio: 'GOIANIA' },
+    '2339552': { lat: -16.7200, lng: -49.2100, municipio: 'GOIANIA' },
+    '2339528': { lat: -16.7100, lng: -49.2850, municipio: 'GOIANIA' }
+  };
+});
+
+await page.click('#useLocation');
+await page.waitForFunction(() => document.getElementById('useLocation')?.textContent?.includes('Proximidade ativada'));
+await page.waitForFunction(() => document.getElementById('locationStatus')?.textContent?.includes('ordenadas pela distância'));
+
+const firstUpa = await page.locator('#serviceResults .service-card').first().evaluate(card => {
+  const name = card.querySelector('h3')?.textContent?.trim() || '';
+  const distance = card.querySelector('[data-service-proximity-distance]')?.textContent || '';
+  const link = [...card.querySelectorAll('a')].find(a => /Traçar rota/i.test(a.textContent || ''));
+  const url = new URL(link.href);
+  return {
+    name,
+    distance,
+    exact: link.dataset.serviceProximityExact,
+    origin: url.searchParams.get('origin'),
+    destination: url.searchParams.get('destination')
+  };
+});
+
+assert.match(firstUpa.name, /UPA Noroeste/i, 'UPA simulada como mais próxima deve ficar em primeiro lugar');
+assert.match(firstUpa.distance, /km em linha reta/, 'UPA deve mostrar distância em linha reta');
+assert.equal(firstUpa.exact, '1', 'rota da UPA deve ser marcada como destino por coordenada exata');
+assert.ok(firstUpa.origin?.startsWith('-16.6869,-49.2648'), 'origem da rota da UPA deve usar localização do aparelho');
+assert.equal(firstUpa.destination, '-16.6871,-49.265', 'destino da UPA deve usar coordenada pública validada');
 
 assert.deepEqual(runtimeErrors, [], `nenhum erro JavaScript esperado: ${runtimeErrors.join(' | ')}`);
 
