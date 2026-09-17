@@ -9,6 +9,7 @@ on:
       - '.github/workflows/raps-proximity-smoke.yml'
   push:
     branches:
+      - main
       - 'fix/raps-*'
     paths:
       - 'raps-no-bolso/**'
