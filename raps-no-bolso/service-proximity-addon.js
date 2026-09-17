@@ -230,13 +230,13 @@
     if(!status) return;
     if(result.withCoordinates && result.allVisibleAreUpas){
       status.dataset.state = 'ok';
-      status.textContent = `${result.withCoordinates} UPA(s) com coordenadas públicas válidas, ordenadas pela distância em linha reta a partir da sua localização.`;
+      status.textContent = `${result.withCoordinates} UPA(s) com coordenadas públicas válidas, ordenadas pela distância em linha reta a partir da sua localização. Sua localização fica apenas em memória no navegador.`;
     } else if(result.withCoordinates){
       status.dataset.state = 'ok';
-      status.textContent = `${result.withCoordinates} UPA(s) receberam distância e rota por coordenada exata. Para comparar somente UPAs por proximidade, selecione “UPA 24h” no filtro.`;
+      status.textContent = `${result.withCoordinates} UPA(s) receberam distância e rota por coordenada exata. Para comparar somente UPAs por proximidade, selecione “UPA 24h” no filtro. Sua localização fica apenas em memória no navegador.`;
     } else {
       status.dataset.state = 'error';
-      status.textContent = 'Localização obtida, mas não consegui obter coordenadas públicas válidas das UPAs agora. As rotas por nome + endereço continuam disponíveis.';
+      status.textContent = 'Localização obtida, mas não consegui obter coordenadas públicas válidas das UPAs agora. As rotas por nome + endereço continuam disponíveis. Sua localização fica apenas em memória no navegador.';
     }
   }
 
@@ -255,7 +255,7 @@
       const status = document.getElementById('locationStatus');
       if(status){
         status.dataset.state = 'error';
-        status.textContent = 'Sua localização foi obtida, mas a base pública de coordenadas não respondeu agora. As rotas por nome + endereço continuam disponíveis.';
+        status.textContent = 'Sua localização foi obtida, mas a base pública de coordenadas não respondeu agora. As rotas por nome + endereço continuam disponíveis. Sua localização fica apenas em memória no navegador.';
       }
       console.warn('[RAPS no Bolso] Proximidade das UPAs indisponível:',error?.message || error);
     }
@@ -277,7 +277,7 @@
       deviceLocation = {lat:position.coords.latitude,lng:position.coords.longitude};
       proximityActive = true;
       const button = document.getElementById('useLocation');
-      if(button) button.textContent = '✓ Proximidade ativada';
+      if(button) button.textContent = '✓ Proximidade ativada (Localização ativada)';
       ensureTransparencyNote();
       await refresh();
     }, error => {
