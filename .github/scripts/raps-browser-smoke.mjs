@@ -106,6 +106,11 @@ check(await page.locator('#serviceResults .service-card').count() >= 4, 'filtro 
 
 await page.click('#useLocation');
 await page.waitForFunction(() => document.getElementById('useLocation')?.textContent?.includes('Localização ativada'));
+await page.waitForFunction(() => {
+  const status = document.getElementById('locationStatus')?.innerText || '';
+  const route = [...document.querySelectorAll('#serviceResults a')].find(a => /Traçar rota/i.test(a.textContent || ''));
+  return status.includes('apenas em memória') && Boolean(route?.href?.includes('origin='));
+});
 check((await page.locator('#locationStatus').innerText()).includes('apenas em memória'), 'GPS informa uso apenas em memória');
 const routeHref = await page.locator('#serviceResults a', { hasText: 'Traçar rota' }).first().getAttribute('href');
 check(Boolean(routeHref && routeHref.includes('origin=')), 'rota externa recebe origem somente após GPS autorizado');
