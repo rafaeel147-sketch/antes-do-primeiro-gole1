@@ -37,7 +37,7 @@ jobs:
         run: |
           node <<'NODE'
           const resource = '7559175a-98ac-4719-bf30-5e6455ba57c5';
-          const sql = `SELECT cnes, latitude, longitude, municipio FROM "${resource}" WHERE cnes='2506386'`;
+          const sql = `SELECT cnes, latitude, longitude, municipio FROM "${resource}" WHERE cnes='7304188'`;
           const url = 'https://dadosabertos.go.gov.br/pt_BR/api/3/action/datastore_search_sql?sql=' + encodeURIComponent(sql);
           const controller = new AbortController();
           const timeout = setTimeout(() => controller.abort(), 10000);
