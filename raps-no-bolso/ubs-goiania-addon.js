@@ -186,7 +186,7 @@ SUL|CS|2339560|Parque Amazônia|Praça José Rodrigues de Morais Neto, s/n, Parq
 
   if(!menuItems.some(([route]) => route === 'ubs-goiania')) {
     const idx = menuItems.findIndex(([route]) => route === 'servicos-goiania');
-    menuItems.splice(idx >= 0 ? idx + 1 : menuItems.length, 0, ['ubs-goiania','＋','UBS em Goiânia','Atenção Básica por distrito, bairro e tipo']);
+    menuItems.splice(idx >= 0 ? idx + 1 : menuItems.length, 0, ['ubs-goiania','🏘️','UBS em Goiânia','Atenção Básica por distrito, bairro e tipo']);
   }
 
   pages['ubs-goiania'] = () => `

@@ -1,17 +1,17 @@
 const BASE = './';
 
 const menuItems = [
-  ['inicio','⌂','Início','O que você procura agora?'],
-  ['direitos','⚖','Meus direitos','Direitos no SUS e na saúde mental'],
+  ['inicio','🏠','Início','O que você procura agora?'],
+  ['direitos','⚖️','Meus direitos','Direitos no SUS e na saúde mental'],
   ['parar-fumar','🚭','Pare de fumar','Dicas práticas para reduzir ou parar'],
-  ['alcool-drogas','◒','Álcool e outras drogas','Informação, escolhas e cuidado'],
-  ['reducao-danos','＋','Redução de danos','Diminuir riscos e proteger a vida'],
-  ['crise','♡','Crise e ansiedade','O que fazer no momento difícil'],
-  ['onde-ajuda','⌖','Onde buscar ajuda','UBS, CAPS, UPA, hospital e SAMU'],
-  ['raps','◎','Entenda a RAPS','Como a rede de cuidado se organiza'],
-  ['ouvsus','◉','OuvSUS','Reclamação, denúncia, pedido e elogio'],
-  ['familia','⌂','Família e rede de apoio','Como apoiar sem julgar'],
-  ['fontes','≡','Fontes e atualização','De onde vêm as informações']
+  ['alcool-drogas','🧭','Álcool e outras drogas','Informação, escolhas e cuidado'],
+  ['reducao-danos','🛡️','Redução de danos','Diminuir riscos e proteger a vida'],
+  ['crise','💙','Crise e ansiedade','O que fazer no momento difícil'],
+  ['onde-ajuda','📍','Onde buscar ajuda','UBS, CAPS, UPA, hospital e SAMU'],
+  ['raps','🔄','Entenda a RAPS','Como a rede de cuidado se organiza'],
+  ['ouvsus','☎️','OuvSUS','Reclamação, denúncia, pedido e elogio'],
+  ['familia','👥','Família e rede de apoio','Como apoiar sem julgar'],
+  ['fontes','📚','Fontes e atualização','De onde vêm as informações']
 ];
 
 const sources = {
