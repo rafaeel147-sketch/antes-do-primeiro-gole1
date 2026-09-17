@@ -41,7 +41,7 @@
       primary:'CAPS/CAPS AD ou serviço que já acompanha você',
       secondary:'UBS também pode ser uma porta de entrada e ajudar a reorganizar o cuidado',
       body:'Se não há sinais de urgência, o objetivo é reduzir riscos e retomar contato com a rede. Não dirija, evite misturar substâncias e, se puder, fique com alguém de confiança até estar mais seguro. Se houver intoxicação importante, perda de consciência, convulsão, dificuldade respiratória ou risco relevante, mude para a rota de urgência.',
-      actions:[['alcool-recaida','O que fazer depois de uma recaída'],['alcool-ajuda','Onde procurar ajuda']]
+      actions:[['ad-recaida','O que fazer depois de uma recaída'],['ad-ajuda','Onde procurar ajuda']]
     },
     abstinencia: {
       level:'danger',
@@ -49,7 +49,7 @@
       primary:'Avaliação profissional — e urgência quando houver sinais graves',
       secondary:'CAPS/CAPS AD, UBS ou serviço que já acompanha podem ajudar a organizar o cuidado quando não houver emergência',
       body:'Abstinência de álcool e de algumas substâncias pode ser perigosa. Se houver convulsão, confusão importante, alteração de consciência, alucinações, dificuldade respiratória, agitação intensa ou piora rápida, procure urgência imediatamente ou acione o SAMU 192. O aplicativo não orienta esquema caseiro de desintoxicação nem doses de medicamentos.',
-      actions:[['alcool-abstinencia','Entender abstinência e sinais de alerta'],['onde-ajuda','Ver portas de cuidado']]
+      actions:[['ad-abstinencia','Entender abstinência e sinais de alerta'],['onde-ajuda','Ver portas de cuidado']]
     },
     crise: {
       level:'attention',

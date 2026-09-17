@@ -1,0 +1,197 @@
+name: RAPS no Bolso smoke checks
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'raps-no-bolso/**'
+      - '.github/workflows/raps-smoke.yml'
+      - '.github/scripts/raps-browser-smoke.mjs'
+      - '.github/scripts/raps-visual-evidence.mjs'
+  push:
+    branches:
+      - 'fix/raps-*'
+    paths:
+      - 'raps-no-bolso/**'
+      - '.github/workflows/raps-smoke.yml'
+      - '.github/scripts/raps-browser-smoke.mjs'
+      - '.github/scripts/raps-visual-evidence.mjs'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Check JavaScript syntax
+        shell: bash
+        run: |
+          set -euo pipefail
+          for file in raps-no-bolso/*.js; do
+            echo "Checking $file"
+            node --check "$file"
+          done
+
+      - name: Check required RAPS files
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -f raps-no-bolso/index.html
+          test -f raps-no-bolso/app.js
+          test -f raps-no-bolso/fase4-safe-addon.js
+          test -f raps-no-bolso/services-goiania-addon.js
+          test -f raps-no-bolso/ubs-goiania-addon.js
+          test -f raps-no-bolso/route-refresh.js
+          test -f raps-no-bolso/sw.js
+          test -f .github/scripts/raps-browser-smoke.mjs
+          test -f .github/scripts/raps-visual-evidence.mjs
+
+      - name: Check addon loading and offline cache
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -Fq "./fase4-safe-addon.js" raps-no-bolso/route-refresh.js
+          grep -Fq "./services-goiania-addon.js" raps-no-bolso/route-refresh.js
+          grep -Fq "./ubs-goiania-addon.js" raps-no-bolso/route-refresh.js
+          grep -Fq "./fase4-safe-addon.js" raps-no-bolso/sw.js
+          grep -Fq "./services-goiania-addon.js" raps-no-bolso/sw.js
+          grep -Fq "./ubs-goiania-addon.js" raps-no-bolso/sw.js
+          grep -Fq "raps-no-bolso-v14" raps-no-bolso/sw.js
+
+      - name: Check Encontre o caminho route integrity
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -Fq "pages['ad-recaida']" raps-no-bolso/alcohol-drugs-addon.js
+          grep -Fq "pages['ad-abstinencia']" raps-no-bolso/alcohol-drugs-addon.js
+          grep -Fq "pages['ad-ajuda']" raps-no-bolso/alcohol-drugs-addon.js
+          grep -Fq "['ad-recaida','O que fazer depois de uma recaída']" raps-no-bolso/care-path-addon.js
+          grep -Fq "['ad-ajuda','Onde procurar ajuda']" raps-no-bolso/care-path-addon.js
+          grep -Fq "['ad-abstinencia','Entender abstinência e sinais de alerta']" raps-no-bolso/care-path-addon.js
+          ! grep -Fq "'alcool-recaida'" raps-no-bolso/care-path-addon.js
+          ! grep -Fq "'alcool-ajuda'" raps-no-bolso/care-path-addon.js
+          ! grep -Fq "'alcool-abstinencia'" raps-no-bolso/care-path-addon.js
+
+      - name: Check canonical abstinence route
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -Fq "pages.abstinencia = () => pages['ad-abstinencia']();" raps-no-bolso/fase4-safe-addon.js
+          ! grep -Fq "fase4InsertAfter('alcool-drogas', ['abstinencia'" raps-no-bolso/fase4-safe-addon.js
+          grep -Fq "pages['ad-abstinencia']" raps-no-bolso/alcohol-drugs-addon.js
+
+      - name: Check deterministic CPF CNS rights update
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -Fq "pages['direitos-atendimento'] = () =>" raps-no-bolso/fase4-safe-addon.js
+          grep -Fq "pages['onde-ajuda'] = () =>" raps-no-bolso/fase4-safe-addon.js
+          grep -Fq "rightsSources.cartao = fase4Sources.identificacao" raps-no-bolso/fase4-safe-addon.js
+          grep -Fq "Não possuir ou não portar documento com o número do CPF ou CNS não é, por si só, impedimento" raps-no-bolso/fase4-safe-addon.js
+          grep -Fq "art. 258" raps-no-bolso/fase4-safe-addon.js
+          ! grep -Fq "function fase4CorrigirIdentificacao" raps-no-bolso/fase4-safe-addon.js
+
+      - name: Check GPS privacy disclosure
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -Fq "GPS opcional para rotas" raps-no-bolso/evaluation-privacy-addon.js
+          grep -Fq "O RAPS no Bolso não grava essa posição" raps-no-bolso/evaluation-privacy-addon.js
+          grep -Fq "A localização é opcional e só é solicitada" raps-no-bolso/fase4-safe-addon.js
+          grep -Fq "navigator.geolocation" raps-no-bolso/services-goiania-addon.js
+          grep -Fq "navigator.geolocation" raps-no-bolso/ubs-goiania-addon.js
+
+      - name: Check addon load failure observability
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -Fq "window.__rapsAddonLoadFailures" raps-no-bolso/route-refresh.js
+          grep -Fq "rapsAddonLoadError" raps-no-bolso/route-refresh.js
+          grep -Fq "Falha ao carregar addon" raps-no-bolso/route-refresh.js
+
+      - name: Check mobile accessibility controls and header
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -Fq 'id="fontDown"' raps-no-bolso/index.html
+          grep -Fq 'id="fontUp"' raps-no-bolso/index.html
+          grep -Fq 'aria-label="RAPS no Bolso — início"' raps-no-bolso/index.html
+          grep -Fq '.brand>span:last-child{display:none}' raps-no-bolso/app.css
+          ! grep -Fq '.a11y-actions button:first-child{display:none}' raps-no-bolso/app.css
+
+      - name: Check current Goiânia urgent directory findings
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -Fq "UPA Chácara do Governador — Dr. Paulo de Siqueira Garcia" raps-no-bolso/services-goiania-addon.js
+          grep -Fq "https://www.goiania.go.gov.br/urgenciaemergencia/" raps-no-bolso/services-goiania-addon.js
+          grep -Fq "16/09/2026" raps-no-bolso/services-goiania-addon.js
+          grep -Fq "As UBSs ficam em um diretório próprio" raps-no-bolso/services-goiania-addon.js
+          ! grep -Fq "UBSs ainda não foram incluídas" raps-no-bolso/services-goiania-addon.js
+
+      - name: Check Goiânia primary care directory
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -Fq "ENDERECOS-UNIDADES-ATENCAO-BASICA.pdf" raps-no-bolso/ubs-goiania-addon.js
+          grep -Fq "Estrela Dalva" raps-no-bolso/ubs-goiania-addon.js
+          grep -Fq "87 registros" raps-no-bolso/ubs-goiania-addon.js
+          grep -Fq "navigator.geolocation" raps-no-bolso/ubs-goiania-addon.js
+          grep -Fq "tel:08006461560" raps-no-bolso/ubs-goiania-addon.js
+
+      - name: Check emergency phone links
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -Rq "tel:192" raps-no-bolso/*.js
+          grep -Rq "tel:136" raps-no-bolso/*.js
+
+  browser-smoke:
+    needs: smoke
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Playwright Chromium
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm install --no-save --package-lock=false playwright@1.55.0
+          npx playwright install --with-deps chromium
+
+      - name: Run functional browser smoke and capture visual evidence
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -m http.server 4173 --bind 127.0.0.1 --directory . >/tmp/raps-http.log 2>&1 &
+          SERVER_PID=$!
+          trap 'kill "$SERVER_PID" 2>/dev/null || true' EXIT
+          for attempt in {1..20}; do
+            if curl -fsS http://127.0.0.1:4173/raps-no-bolso/ >/dev/null; then
+              break
+            fi
+            sleep 1
+          done
+          curl -fsS http://127.0.0.1:4173/raps-no-bolso/ >/dev/null
+          node .github/scripts/raps-browser-smoke.mjs
+          node .github/scripts/raps-visual-evidence.mjs
+
+      - name: Upload visual evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: raps-browser-smoke-${{ github.sha }}
+          path: artifacts/raps-browser/*.png
+          if-no-files-found: warn
+          retention-days: 14
