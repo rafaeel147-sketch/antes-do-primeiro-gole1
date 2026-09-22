@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 700">
+<rect width="1200" height="700" fill="#efe7d7"/>
+<rect x="54" y="54" width="1092" height="592" rx="34" fill="#211b17"/>
+<text x="95" y="135" font-family="Georgia,serif" font-size="28" fill="#d7a34d" letter-spacing="4">ECOSSISTEMA PET / CEPV</text>
+<text x="95" y="205" font-family="Arial,sans-serif" font-size="20" fill="#f5efe4">Precisão antes de velocidade · evidência · validação humana · rastreabilidade</text>
+<g font-family="Arial,sans-serif" font-weight="700" font-size="22" text-anchor="middle">
+<g fill="#f8f3ea" stroke="#b77719" stroke-width="3">
+<rect x="85" y="290" width="185" height="95" rx="22"/><rect x="295" y="290" width="185" height="95" rx="22"/><rect x="505" y="290" width="185" height="95" rx="22"/><rect x="715" y="290" width="185" height="95" rx="22"/><rect x="925" y="290" width="185" height="95" rx="22"/>
+<rect x="190" y="435" width="185" height="95" rx="22"/><rect x="400" y="435" width="185" height="95" rx="22"/><rect x="610" y="435" width="185" height="95" rx="22"/><rect x="820" y="435" width="185" height="95" rx="22"/>
+</g>
+<g fill="#211b17"><text x="177" y="347">🦉 CORUJA</text><text x="387" y="347">🔎 SHERLOCK</text><text x="597" y="347">🐒 MACACO</text><text x="807" y="347">🐔 GALINHA</text><text x="1017" y="347">🦜 PAPAGAIO</text><text x="282" y="492">🐇 SARA</text><text x="492" y="492">🐍 JÉSSICA</text><text x="702" y="492">🎨 DA VINCI</text><text x="912" y="492">HUMANO</text></g></g>
+<text x="95" y="600" font-family="Georgia,serif" font-size="26" fill="#d7a34d">Perfil → Contrato → Preflight → Execução → Evidência → Validação → Progresso</text>
+</svg>
