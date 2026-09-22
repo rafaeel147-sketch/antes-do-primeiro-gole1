@@ -15,6 +15,7 @@
         <span class="brand-mark">🦉</span>
         <span><b>PET / CEPV</b><small>Precisão antes de velocidade</small></span>
       </a>
+
       <nav class="main-nav">
         <button class="nav-item active" data-route="inicio"><span>⌂</span>Visão geral</button>
         <button class="nav-item" data-route="metodologia"><span>◎</span>Metodologia</button>
@@ -23,14 +24,24 @@
         <button class="nav-item" data-route="biblioteca"><span>▤</span>Biblioteca</button>
         <button class="nav-item" data-route="laboratorio"><span>⌁</span>Laboratório</button>
       </nav>
-      <div class="side-note"><span>ESTADO DO SISTEMA</span><b>v0.2.3 congelada</b><small>v0.2.4 Phase A: checkpoint validado</small></div>
-      <div class="sidebar-foot"><span class="dot"></span> MVP Fase 1 · sem API de IA</div>
+
+      <div class="side-note">
+        <span>ESTADO DO SISTEMA</span>
+        <b>v0.2.3 congelada</b>
+        <small>v0.2.4 Phase A: checkpoint validado</small>
+      </div>
+
+      <div class="sidebar-foot">
+        <span class="dot"></span> MVP Fase 1 · sem API de IA
+      </div>
     </aside>
+
     <div class="mobile-topbar">
       <button id="menuToggle" class="icon-button" aria-label="Abrir menu">☰</button>
       <div><b>PET / CEPV</b><small id="mobileRoute">Visão geral</small></div>
       <span class="status-pill">MVP</span>
     </div>
+
     <main class="content">
       <section class="view active" id="view-inicio" data-title="Visão geral">
         <div class="eyebrow">PROJETO PET / CEPV · MVP INSTITUCIONAL</div>
@@ -38,28 +49,81 @@
           <div class="hero-copy">
             <h1>Perfis, funções reais,<br><em>evidência antes da conclusão.</em></h1>
             <p class="lead">Uma metodologia para coordenar especialistas, executar com contratos claros, registrar evidências e validar resultados com decisão humana.</p>
-            <div class="hero-actions"><button class="btn primary" data-route="metodologia">Conhecer a metodologia</button><button class="btn ghost" data-route="evidencias">Ver evidências</button></div>
-            <div class="hero-metrics"><div><strong>01</strong><span>Coruja coordena</span></div><div><strong>07+</strong><span>PETs especializados</span></div><div><strong>3</strong><span>estados de evidência</span></div></div>
+            <div class="hero-actions">
+              <button class="btn test-cta" data-home-test>⚗ Testar agora</button>
+              <button class="btn primary" data-route="metodologia">Conhecer a metodologia</button>
+              <button class="btn ghost" data-route="evidencias">Ver evidências</button>
+            </div>
+            <div class="hero-metrics">
+              <div><strong>01</strong><span>Coruja coordena</span></div>
+              <div><strong>07+</strong><span>PETs especializados</span></div>
+              <div><strong>3</strong><span>estados de evidência</span></div>
+            </div>
           </div>
-          <div class="hero-visual paper-card"><img src="assets/mapa-pets.svg" alt="Mapa visual da bicharada PET/CEPV" /><div class="paper-caption"><span>ARQUIVO VISUAL</span><b>A alma editorial do projeto</b></div></div>
+          <div class="hero-visual team-hero" aria-label="A bicharada PET/CEPV reunida">
+            <img src="assets/bicharada-junta.svg" alt="Coruja Boss e PETs especialistas reunidos" />
+            <div class="team-hero-note"><span>🦉 CORUJA COORDENA</span><b>Especialistas diferentes. Um processo verificável.</b></div>
+          </div>
         </div>
-        <div class="principle-strip"><span>REGRA MESTRE</span><p>Precisão antes de velocidade. Hipótese não vira fato. Evidência não vira memória sem validação.</p></div>
-        <div class="section-head"><div><span class="kicker">COMO OPERA</span><h2>Do pedido ao aprendizado validado</h2></div><button class="text-link" data-route="metodologia">Ver fluxo completo →</button></div>
+
+        <section class="home-test" id="homeTest" aria-labelledby="homeTestTitle">
+          <div class="home-test-copy">
+            <span class="kicker">EXPERIMENTE AGORA · SEM IA</span>
+            <h2 id="homeTestTitle">Teste o PET/CEPV com um documento.</h2>
+            <p>O arquivo fica no seu navegador. Nesta Fase 1 o sistema calcula metadados, métricas disponíveis e SHA-256 — sem enviar o conteúdo para API.</p>
+            <label class="quick-upload" for="homeFileInput"><span class="quick-upload-icon">＋</span><span><b>Escolher documento</b><small>TXT, MD, JSON ou PDF</small></span><input id="homeFileInput" type="file" accept=".txt,.md,.json,.pdf,text/plain,application/pdf,application/json" /></label>
+            <button class="text-link" data-route="laboratorio">Abrir laboratório completo →</button>
+          </div>
+          <div class="home-analysis" id="homeAnalysis">
+            <div class="home-analysis-empty"><span>⌁</span><b>Resultado aparece aqui</b><small>Processamento local e determinístico.</small></div>
+          </div>
+        </section>
+
+        <section class="home-team" aria-labelledby="homeTeamTitle">
+          <div class="section-head home-team-head"><div><span class="kicker">A EQUIPE</span><h2 id="homeTeamTitle">A bicharada, sem corte no celular.</h2><p>Arraste para o lado para conhecer os PETs. Os cartões usam snap para não “sumirem” no meio da tela.</p></div><button class="text-link" data-route="pets">Ver todos →</button></div>
+          <div class="pet-rail" aria-label="Especialistas PET/CEPV">
+            <article><span>🦉</span><b>Coruja Boss</b><small>Coordenação</small></article>
+            <article><span>🐒</span><b>Macaco</b><small>Execução</small></article>
+            <article><span>🐔</span><b>Galinha</b><small>Crítica</small></article>
+            <article><span>🦜</span><b>Papagaio</b><small>Conversa</small></article>
+            <article><span>🔎</span><b>Sherlock</b><small>Investigação</small></article>
+            <article><span>🐇</span><b>Sara</b><small>Impacto humano</small></article>
+            <article><span>🐍</span><b>Jéssica</b><small>Saúde e risco</small></article>
+            <article><span>🎨</span><b>Da Vinci</b><small>Design</small></article>
+          </div>
+        </section>
+
+        <div class="principle-strip">
+          <span>REGRA MESTRE</span>
+          <p>Precisão antes de velocidade. Hipótese não vira fato. Evidência não vira memória sem validação.</p>
+        </div>
+
+        <div class="section-head">
+          <div><span class="kicker">COMO OPERA</span><h2>Do pedido ao aprendizado validado</h2></div>
+          <button class="text-link" data-route="metodologia">Ver fluxo completo →</button>
+        </div>
         <div class="flow-row compact-flow">
-          <div class="flow-node"><span>01</span><b>Pedido</b><small>objetivo e contexto</small></div><div class="flow-arrow">→</div>
-          <div class="flow-node"><span>02</span><b>Coruja</b><small>preflight e seleção</small></div><div class="flow-arrow">→</div>
-          <div class="flow-node"><span>03</span><b>PETs</b><small>execução especializada</small></div><div class="flow-arrow">→</div>
-          <div class="flow-node"><span>04</span><b>Checks</b><small>evidência e refutação</small></div><div class="flow-arrow">→</div>
+          <div class="flow-node"><span>01</span><b>Pedido</b><small>objetivo e contexto</small></div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-node"><span>02</span><b>Coruja</b><small>preflight e seleção</small></div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-node"><span>03</span><b>PETs</b><small>execução especializada</small></div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-node"><span>04</span><b>Checks</b><small>evidência e refutação</small></div>
+          <div class="flow-arrow">→</div>
           <div class="flow-node"><span>05</span><b>Humano</b><small>validação e decisão</small></div>
         </div>
+
         <div class="cards-3">
           <article class="feature-card"><div class="icon-box">🔎</div><span class="kicker">INVESTIGAÇÃO</span><h3>Fonte antes da afirmação</h3><p>Sherlock rastreia documentos, fontes primárias e cadeia de evidência.</p></article>
           <article class="feature-card"><div class="icon-box">🐔</div><span class="kicker">CONTRADITÓRIO</span><h3>Conclusão precisa sobreviver</h3><p>Galinha procura erro, viés, exagero, falso positivo e hipótese alternativa.</p></article>
           <article class="feature-card"><div class="icon-box">🐒</div><span class="kicker">EXECUÇÃO</span><h3>Resultado precisa existir</h3><p>Macaco estrutura, implementa, organiza e transforma evidência em artefato verificável.</p></article>
         </div>
       </section>
+
       <section class="view" id="view-metodologia" data-title="Metodologia">
         <div class="page-title"><div><span class="eyebrow">MÉTODO PET / CEPV</span><h1>Governança antes da automação.</h1><p>O motor organiza o trabalho; a IA, quando existir, será apenas um componente do fluxo.</p></div><div class="stamp">CEPV<br><small>CAMADA VERIFICÁVEL</small></div></div>
+
         <div class="method-grid">
           <article class="method-card"><span>01</span><h3>Perfil</h3><p>Especialidade, limites, escopo e responsabilidade de cada PET.</p></article>
           <article class="method-card"><span>02</span><h3>Contrato</h3><p>Define entrada, saída esperada, regras, ferramentas e condições de falha.</p></article>
@@ -70,11 +134,19 @@
           <article class="method-card"><span>07</span><h3>Aprendizado</h3><p>Somente aprendizado validado é promovido; conflito gera revisão, não sobrescrita silenciosa.</p></article>
           <article class="method-card accent"><span>08</span><h3>Decisão humana</h3><p>O sistema informa, organiza e verifica. A decisão final permanece humana.</p></article>
         </div>
+
         <div class="quote-panel"><span>“</span><blockquote>O motor não é a IA. O motor decide como o trabalho deve acontecer, quando uma etapa pode continuar e o que precisa ser comprovado antes.</blockquote></div>
       </section>
+
       <section class="view" id="view-pets" data-title="Bicharada">
         <div class="page-title"><div><span class="eyebrow">PERFIS ESPECIALISTAS</span><h1>A bicharada trabalha de verdade.</h1><p>Cada PET possui uma função operacional; a Coruja escolhe apenas os necessários para cada missão.</p></div><img class="mini-poster" src="assets/ecossistema.svg" alt="Ecossistema PET/CEPV" /></div>
-        <div class="filter-row" role="tablist"><button class="filter active" data-filter="todos">Todos</button><button class="filter" data-filter="governanca">Governança</button><button class="filter" data-filter="investigacao">Investigação</button><button class="filter" data-filter="execucao">Execução</button><button class="filter" data-filter="humano">Humano</button></div>
+        <div class="filter-row" role="tablist">
+          <button class="filter active" data-filter="todos">Todos</button>
+          <button class="filter" data-filter="governanca">Governança</button>
+          <button class="filter" data-filter="investigacao">Investigação</button>
+          <button class="filter" data-filter="execucao">Execução</button>
+          <button class="filter" data-filter="humano">Humano</button>
+        </div>
         <div class="pet-grid" id="petGrid">
           <article class="pet-card" data-cat="governanca"><div class="pet-avatar">🦉</div><div><span>COORDENAÇÃO</span><h3>Coruja Boss</h3><p>Preflight, seleção de PETs, integração, governança e controle de qualidade.</p><b>Decide quem entra e quando parar.</b></div></article>
           <article class="pet-card" data-cat="investigacao"><div class="pet-avatar">🔎</div><div><span>INVESTIGAÇÃO</span><h3>Sherlock Holmes</h3><p>Fontes primárias, OSINT, documentos, evidência e reconstrução factual.</p><b>Encontra o que sustenta ou derruba a hipótese.</b></div></article>
@@ -86,9 +158,14 @@
           <article class="pet-card" data-cat="execucao"><div class="pet-avatar">🎨</div><div><span>VISUAL</span><h3>Da Vinci</h3><p>Design, imagem, vídeo, linguagem visual e comunicação estética.</p><b>Transforma método em experiência compreensível.</b></div></article>
         </div>
       </section>
+
       <section class="view" id="view-evidencias" data-title="Evidências">
         <div class="page-title"><div><span class="eyebrow">RASTREABILIDADE</span><h1>O que foi feito precisa poder ser conferido.</h1><p>Casos, checkpoints, versões e artefatos formam a trilha de evidência do projeto.</p></div></div>
-        <div class="status-board"><div class="status-card ok"><span>BASELINE</span><b>v0.2.3</b><small>oficial · congelada</small></div><div class="status-card warn"><span>CANDIDATA</span><b>v0.2.4 Phase A</b><small>checkpoint validado · não promovida</small></div><div class="status-card stop"><span>LIVE</span><b>Não autorizado</b><small>Phase B não iniciada</small></div></div>
+        <div class="status-board">
+          <div class="status-card ok"><span>BASELINE</span><b>v0.2.3</b><small>oficial · congelada</small></div>
+          <div class="status-card warn"><span>CANDIDATA</span><b>v0.2.4 Phase A</b><small>checkpoint validado · não promovida</small></div>
+          <div class="status-card stop"><span>LIVE</span><b>Não autorizado</b><small>Phase B não iniciada</small></div>
+        </div>
         <div class="timeline">
           <article><time>13 SET 2026</time><div><span class="tag confirmed">CONFIRMADO</span><h3>Baseline e pacote de auditoria</h3><p>Preservação do estado verificável e dos artefatos de auditoria.</p></div></article>
           <article><time>20 SET 2026</time><div><span class="tag confirmed">CONFIRMADO</span><h3>Auditoria do Policy Gate</h3><p>Separação entre gate existente na baseline e condição experimental do harness.</p></div></article>
@@ -96,6 +173,7 @@
           <article><time>PRÓXIMO</time><div><span class="tag undetermined">NÃO DETERMINADO</span><h3>Phase B / governança real</h3><p>Autoridade, assinaturas, revogação, registro confiável e operação real ainda exigem decisão.</p></div></article>
         </div>
       </section>
+
       <section class="view" id="view-biblioteca" data-title="Biblioteca">
         <div class="page-title"><div><span class="eyebrow">BIBLIOTECA DOCUMENTAL</span><h1>Documento não é decoração. É memória verificável.</h1><p>Primeiro MVP: índice visual. Integração automática com Drive fica para um incremento posterior.</p></div></div>
         <div class="library-toolbar"><input id="docSearch" type="search" placeholder="Buscar documento ou tema…" /><select id="docFilter"><option value="todos">Todos os tipos</option><option value="governanca">Governança</option><option value="auditoria">Auditoria</option><option value="proposta">Proposta</option><option value="checkpoint">Checkpoint</option></select></div>
@@ -108,16 +186,29 @@
           <article data-type="governanca"><span class="doc-icon">▣</span><div><b>PET_CEPV_BICHARADA_COMPLETO_2026-09-20.pdf</b><small>Identidade visual · perfis PET</small></div><span class="tag confirmed">VISUAL</span></article>
         </div>
       </section>
+
       <section class="view" id="view-laboratorio" data-title="Laboratório">
         <div class="page-title"><div><span class="eyebrow">LABORATÓRIO DOCUMENTAL · SEM IA</span><h1>Primeiro esgotar o determinístico.</h1><p>Este protótipo processa o arquivo localmente no navegador. Nada é enviado para uma API.</p></div></div>
         <div class="lab-grid">
-          <div class="upload-panel"><label class="dropzone" for="fileInput" id="dropzone"><div class="upload-mark">＋</div><h3>Escolha um documento</h3><p>TXT, MD, JSON ou PDF</p><small>PDF: nesta versão, calcula metadados e SHA-256; extração textual entra no próximo incremento.</small><input id="fileInput" type="file" accept=".txt,.md,.json,.pdf,text/plain,application/pdf,application/json" /></label><div class="privacy-note">⌁ Processamento local · sem upload · sem chave de IA</div></div>
-          <div class="analysis-panel" id="analysisPanel"><div class="empty-analysis"><span>⌁</span><h3>Nenhum documento carregado</h3><p>Quando um arquivo entrar, o motor local mostra metadados, hash e métricas disponíveis.</p></div></div>
+          <div class="upload-panel">
+            <label class="dropzone" for="fileInput" id="dropzone"><div class="upload-mark">＋</div><h3>Escolha um documento</h3><p>TXT, MD, JSON ou PDF</p><small>PDF: nesta versão, calcula metadados e SHA-256; extração textual entra no próximo incremento.</small><input id="fileInput" type="file" accept=".txt,.md,.json,.pdf,text/plain,application/pdf,application/json" /></label>
+            <div class="privacy-note">⌁ Processamento local · sem upload · sem chave de IA</div>
+          </div>
+          <div class="analysis-panel" id="analysisPanel">
+            <div class="empty-analysis"><span>⌁</span><h3>Nenhum documento carregado</h3><p>Quando um arquivo entrar, o motor local mostra metadados, hash e métricas disponíveis.</p></div>
+          </div>
         </div>
         <div class="cost-panel"><div><span class="kicker">ARQUITETURA DE CUSTO</span><h3>API só quando interpretação realmente for necessária.</h3></div><div class="cost-flow"><span>Arquivo</span><i>→</i><span>Regras locais</span><i>→</i><span>Trechos relevantes</span><i>→</i><span class="future">IA futura</span></div></div>
       </section>
     </main>
-    <div class="mobile-nav" aria-label="Navegação móvel"><button class="active" data-route="inicio"><span>⌂</span>Início</button><button data-route="metodologia"><span>◎</span>Método</button><button data-route="pets"><span>✦</span>PETs</button><button data-route="evidencias"><span>▣</span>Provas</button><button data-route="laboratorio"><span>⌁</span>Lab</button></div>
+
+    <div class="mobile-nav" aria-label="Navegação móvel">
+      <button class="active" data-route="inicio"><span>⌂</span>Início</button>
+      <button data-route="metodologia"><span>◎</span>Método</button>
+      <button data-route="pets"><span>✦</span>PETs</button>
+      <button data-route="evidencias"><span>▣</span>Provas</button>
+      <button data-route="laboratorio"><span>⌁</span>Lab</button>
+    </div>
   </div>
   <div class="menu-backdrop" id="menuBackdrop"></div>
   <script src="app.js"></script>
