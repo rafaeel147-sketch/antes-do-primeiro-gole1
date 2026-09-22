@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 700">
+<rect width="1200" height="700" fill="#f3eee3"/>
+<text x="70" y="90" font-family="Georgia,serif" font-size="46" fill="#211b17">A bicharada como equipe especializada</text>
+<line x1="70" y1="115" x2="1130" y2="115" stroke="#b77719" stroke-width="4"/>
+<g font-family="Arial,sans-serif" font-size="19" fill="#211b17">
+<g transform="translate(80,175)"><rect width="300" height="155" rx="26" fill="#fffaf0" stroke="#d7a34d" stroke-width="3"/><text x="25" y="42" font-size="28" font-weight="700">🦉 Coruja Boss</text><text x="25" y="82">Coordena, decide e integra.</text><text x="25" y="112">Segura escopo e qualidade.</text></g>
+<g transform="translate(450,175)"><rect width="300" height="155" rx="26" fill="#fffaf0" stroke="#d7a34d" stroke-width="3"/><text x="25" y="42" font-size="28" font-weight="700">🔎 Sherlock</text><text x="25" y="82">Investiga fontes e evidências.</text><text x="25" y="112">Reconstrói fatos.</text></g>
+<g transform="translate(820,175)"><rect width="300" height="155" rx="26" fill="#fffaf0" stroke="#d7a34d" stroke-width="3"/><text x="25" y="42" font-size="28" font-weight="700">🐒 Macaco</text><text x="25" y="82">Executa e estrutura.</text><text x="25" y="112">Código, arquivos e artefatos.</text></g>
+<g transform="translate(80,395)"><rect width="300" height="155" rx="26" fill="#fffaf0" stroke="#d7a34d" stroke-width="3"/><text x="25" y="42" font-size="28" font-weight="700">🐔 Galinha</text><text x="25" y="82">Critica e busca falhas.</text><text x="25" y="112">Reduz falso positivo.</text></g>
+<g transform="translate(450,395)"><rect width="300" height="155" rx="26" fill="#fffaf0" stroke="#d7a34d" stroke-width="3"/><text x="25" y="42" font-size="28" font-weight="700">🦜 Papagaio</text><text x="25" y="82">Traduz e conversa.</text><text x="25" y="112">Clareza sem perder precisão.</text></g>
+<g transform="translate(820,395)"><rect width="300" height="155" rx="26" fill="#211b17" stroke="#d7a34d" stroke-width="3"/><text x="25" y="42" font-size="28" font-weight="700" fill="#d7a34d">+ especialistas</text><text x="25" y="82" fill="#fffaf0">Sara · Jéssica · Da Vinci</text><text x="25" y="112" fill="#fffaf0">e PETs futuros por contrato.</text></g>
+</g>
+</svg>
