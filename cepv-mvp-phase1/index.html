@@ -41,7 +41,11 @@
           <button class="orb" data-pet="davinci" aria-label="Da Vinci, visual"><img src="assets/pets/davinci.jpg" alt=""><span>Da Vinci</span></button>
         </div>
       </div>
-      <div class="work-status" aria-live="polite"><i></i><b id="workLabel">Coruja coordenando</b><span id="workDetail">A equipe entra conforme a tarefa.</span></div>
+      <div class="work-status" aria-live="polite"><i></i><b id="workLabel">Equipe disponível</b><span id="workDetail">Os PETs só entram em atividade quando há uma tarefa verificável.</span></div>
+      <div class="work-stage" id="workStage" hidden aria-live="polite">
+        <figure class="work-stage-pet"><img id="workPetImage" src="assets/pets/macaco.jpg" alt=""><figcaption><span id="workPetRole">EXECUÇÃO</span><b id="workPetName">Macaco</b></figcaption></figure>
+        <div><p class="eyebrow">ETAPA EM EXECUÇÃO</p><b id="workStageTitle">Aguardando tarefa</b><small id="workStageDetail">Nenhum PET está trabalhando neste momento.</small></div>
+      </div>
     </section>
 
     <section class="view active" id="view-inicio" data-title="Visão geral">
