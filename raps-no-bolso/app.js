@@ -2,12 +2,12 @@ const BASE = './';
 
 const menuItems = [
   ['inicio','🏠','Início','O que você procura agora?'],
+  ['onde-ajuda','📍','Onde buscar ajuda','UBS, CAPS, UPA, hospital e SAMU'],
   ['direitos','⚖️','Meus direitos','Direitos no SUS e na saúde mental'],
   ['parar-fumar','🚭','Pare de fumar','Dicas práticas para reduzir ou parar'],
   ['alcool-drogas','🧭','Álcool e outras drogas','Informação, escolhas e cuidado'],
   ['reducao-danos','🛡️','Redução de danos','Diminuir riscos e proteger a vida'],
   ['crise','💙','Crise e ansiedade','O que fazer no momento difícil'],
-  ['onde-ajuda','📍','Onde buscar ajuda','UBS, CAPS, UPA, hospital e SAMU'],
   ['raps','🔄','Entenda a RAPS','Como a rede de cuidado se organiza'],
   ['ouvsus','☎️','OuvSUS','Reclamação, denúncia, pedido e elogio'],
   ['familia','👥','Família e rede de apoio','Como apoiar sem julgar'],
@@ -62,17 +62,25 @@ const pages = {
       ${emergencyStrip()}
       <section class="hero">
         <div class="hero-main">
-          <div class="eyebrow">Informação simples para decisões reais</div>
-          <h1>O que você procura agora?</h1>
-          <p class="lead">Escolha uma área. Cada opção abre um caminho próprio, com informação curta primeiro e detalhes quando você quiser.</p>
+          <div class="eyebrow">Acesso simples a serviços e direitos</div>
+          <h1>Encontre um caminho de cuidado no SUS</h1>
+          <p class="lead">Entenda qual porta pode ajudar e consulte serviços de Goiânia por nome, tipo ou bairro. Você pode pesquisar sem ativar o GPS.</p>
           <div class="hero-actions">
-            ${link('direitos','Ver meus direitos','btn')}
-            ${link('parar-fumar','Quero parar de fumar','btn secondary')}
+            ${link('onde-ajuda','Entender as portas de cuidado','btn')}
+            ${link('servicos-goiania','Encontrar serviços em Goiânia','btn secondary')}
           </div>
         </div>
         <div class="hero-side">
           <div><span class="badge">PROTÓTIPO EDUCATIVO</span><h2 style="margin-top:14px">Rede, não labirinto.</h2><p>Você não precisa decorar qual serviço faz o quê. O aplicativo explica as portas de cuidado sem fazer diagnóstico ou prometer atendimento.</p></div>
-          <div class="mini-box"><strong>Sem cadastro clínico</strong><br><small>Esta versão não pede relato de consumo, prontuário ou localização.</small></div>
+          <div class="mini-box"><strong>Sem cadastro clínico</strong><br><small>Esta versão não exige relato de consumo, prontuário nem localização para consultar serviços.</small></div>
+        </div>
+      </section>
+      <section class="panel soft">
+        <h2>Escolha como buscar</h2>
+        <p><strong>Sem localização:</strong> pesquise pelo nome, bairro ou tipo de serviço. <strong>Se quiser usar GPS:</strong> ative a opção apenas na página do diretório. Antes de sair de casa, confirme endereço, horário e forma de acesso na fonte oficial indicada em cada serviço.</p>
+        <div class="hero-actions">
+          ${link('ubs-goiania','Ver unidades básicas em Goiânia','btn secondary')}
+          ${link('avaliacao-teste','Testar se a busca funciona para você','btn secondary')}
         </div>
       </section>
       <div class="section-head"><div><div class="eyebrow">Menu principal</div><h2>Escolha por necessidade</h2></div><p>Os cartões abaixo levam para conteúdos separados. Nada de uma página única interminável.</p></div>
