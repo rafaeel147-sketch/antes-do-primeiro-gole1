@@ -2,12 +2,12 @@ const BASE = './';
 
 const menuItems = [
   ['inicio','🏠','Início','O que você procura agora?'],
+  ['onde-ajuda','📍','Onde buscar ajuda','UBS, CAPS, UPA, hospital e SAMU'],
   ['direitos','⚖️','Meus direitos','Direitos no SUS e na saúde mental'],
   ['parar-fumar','🚭','Pare de fumar','Dicas práticas para reduzir ou parar'],
   ['alcool-drogas','🧭','Álcool e outras drogas','Informação, escolhas e cuidado'],
   ['reducao-danos','🛡️','Redução de danos','Diminuir riscos e proteger a vida'],
   ['crise','💙','Crise e ansiedade','O que fazer no momento difícil'],
-  ['onde-ajuda','📍','Onde buscar ajuda','UBS, CAPS, UPA, hospital e SAMU'],
   ['raps','🔄','Entenda a RAPS','Como a rede de cuidado se organiza'],
   ['ouvsus','☎️','OuvSUS','Reclamação, denúncia, pedido e elogio'],
   ['familia','👥','Família e rede de apoio','Como apoiar sem julgar'],
@@ -72,7 +72,7 @@ const pages = {
         </div>
         <div class="hero-side">
           <div><span class="badge">PROTÓTIPO EDUCATIVO</span><h2 style="margin-top:14px">Rede, não labirinto.</h2><p>Você não precisa decorar qual serviço faz o quê. O aplicativo explica as portas de cuidado sem fazer diagnóstico ou prometer atendimento.</p></div>
-          <div class="mini-box"><strong>Sem cadastro clínico</strong><br><small>Esta versão não pede relato de consumo, prontuário ou localização.</small></div>
+          <div class="mini-box"><strong>Sem cadastro clínico</strong><br><small>Esta versão não exige relato de consumo, prontuário nem localização para consultar serviços.</small></div>
         </div>
       </section>
       <section class="panel soft">
