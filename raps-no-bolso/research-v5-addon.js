@@ -38,6 +38,16 @@
           <span><strong>Participação social</strong><p>Organize sugestões, melhorias e propostas sem confundir registro local com protocolo oficial.</p></span>
           <span class="go">›</span>
         </a>
+        <a class="nav-card" href="?p=escuta-comunitaria" data-route="escuta-comunitaria">
+          <span class="icon-square">🧭</span>
+          <span><strong>Escuta comunitária</strong><p>Dificuldades de acesso, informação faltante e sugestões em formulário sem identificação obrigatória.</p></span>
+          <span class="go">›</span>
+        </a>
+        <a class="nav-card" href="?p=pesquisa-painel-agregado" data-route="pesquisa-painel-agregado">
+          <span class="icon-square">Σ</span>
+          <span><strong>Síntese agregada</strong><p>Indicadores locais e exportação sem texto livre por padrão.</p></span>
+          <span class="go">›</span>
+        </a>
         <a class="nav-card" href="?p=apresentacao-cientifica" data-route="apresentacao-cientifica">
           <span class="icon-square">▦</span>
           <span><strong>Apresentação científica</strong><p>Problema, objetivo, método possível, estágio do protótipo e indicadores avaliáveis.</p></span>
@@ -164,7 +174,8 @@
     'finishTestForm',
     'suggestionForm',
     'improvementForm',
-    'proposalForm'
+    'proposalForm',
+    'communityListeningForm'
   ]);
   let consentDialogOpen = false;
 
