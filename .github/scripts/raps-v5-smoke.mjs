@@ -26,6 +26,14 @@ async function readStore(page, dbName) {
   }, { dbName });
 }
 
+async function setChecked(page, selector) {
+  await page.locator(selector).evaluate(el => {
+    el.checked = true;
+    el.dispatchEvent(new Event('input', { bubbles: true }));
+    el.dispatchEvent(new Event('change', { bubbles: true }));
+  });
+}
+
 async function acceptConsent(page) {
   await page.waitForSelector('#v5ConsentBackdrop');
   const accept = page.locator('#v5ConsentAccept');
@@ -63,10 +71,10 @@ try {
 
     await page.goto(base + '?p=avaliacao-rapida', { waitUntil: 'networkidle' });
     await page.selectOption('#quickEvalForm select[name="module"]', 'geral');
-    await page.check('#quickEvalForm input[name="completed"][value="sim"]', { force: true });
-    await page.check('#quickEvalForm input[name="clarity"][value="5"]', { force: true });
-    await page.check('#quickEvalForm input[name="ease"][value="5"]', { force: true });
-    await page.check('#quickEvalForm input[name="nextStep"][value="sim"]', { force: true });
+    await setChecked(page, '#quickEvalForm input[name="completed"][value="sim"]');
+    await setChecked(page, '#quickEvalForm input[name="clarity"][value="5"]');
+    await setChecked(page, '#quickEvalForm input[name="ease"][value="5"]');
+    await setChecked(page, '#quickEvalForm input[name="nextStep"][value="sim"]');
     await page.fill('#quickEvalForm textarea[name="note"]', 'Teste V5 sem dados pessoais');
     await page.locator('#quickEvalForm button[type="submit"]').click();
 
@@ -101,7 +109,7 @@ try {
     await page.fill('#suggestionForm input[name="title"]', 'Melhorar sinalização');
     await page.fill('#suggestionForm textarea[name="problem"]', 'É difícil localizar a entrada correta.');
     await page.fill('#suggestionForm textarea[name="suggestion"]', 'Adicionar sinalização simples.');
-    await page.check('#suggestionForm input[name="safePhoto"]', { force: true });
+    await setChecked(page, '#suggestionForm input[name="safePhoto"]');
     await page.locator('#suggestionForm button[type="submit"]').click();
 
     await page.waitForSelector('#v5ConsentBackdrop');
