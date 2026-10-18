@@ -1,3 +1,4 @@
+import { readFile } from 'node:fs/promises';
 import { chromium } from 'playwright';
 
 const base = 'http://127.0.0.1:4173/raps-no-bolso/';
@@ -141,6 +142,14 @@ try {
     assert((await page.locator('h1').innerText()).includes('Escuta comunitária'), 'Página de escuta comunitária não abriu');
     assert(await page.locator('[data-v5-consent-note]').count(), 'Escuta comunitária não recebeu aviso de participação opcional');
 
+    await page.evaluate(() => window.RAPSResearchV5?.askConsent?.(() => {}));
+    await page.waitForSelector('#v5ConsentBackdrop');
+    assert(await page.locator('#v5ConsentAccept').isDisabled(), 'Ação de continuar deve iniciar desabilitada');
+    await page.click('#v5ConsentCancel');
+    await page.waitForSelector('#v5ConsentBackdrop', { state: 'detached' });
+    assert(await page.evaluate(() => window.RAPSResearchV5?.hasConsent?.() === false), 'Agora não não pode registrar consentimento');
+    assert(await page.locator('#communityListeningForm').isVisible(), 'Recusar consentimento não pode bloquear o uso da página');
+
     const forbiddenInputs = await page.locator(
       '#communityListeningForm input[name="cpf"],' +
       '#communityListeningForm input[name="cns"],' +
@@ -197,6 +206,18 @@ try {
     const aggregateText = JSON.stringify(aggregate);
     assert(!aggregateText.includes('MARCADOR_TEXTO_LIVRE_V5'), 'Texto livre vazou para a síntese agregada');
     assert(!aggregateText.includes(record.id), 'ID individual vazou para a síntese agregada');
+
+    const downloadPromise = page.waitForEvent('download');
+    await page.click('#exportAggregateJson');
+    const jsonDownload = await downloadPromise;
+    const jsonPath = await jsonDownload.path();
+    assert(Boolean(jsonPath), 'Exportação agregada JSON não gerou arquivo');
+    const exportedText = await readFile(jsonPath, 'utf8');
+    const exported = JSON.parse(exportedText);
+    assert(exported.schema === 'raps-v5-aggregate-1', 'JSON exportado usa schema inesperado');
+    assert(!exportedText.includes('MARCADOR_TEXTO_LIVRE_V5'), 'Texto livre vazou no arquivo JSON exportado');
+    assert(!exportedText.includes(record.id), 'ID individual vazou no arquivo JSON exportado');
+    assert(exported.privacy.freeTextIncluded === false && exported.privacy.preciseLocationIncluded === false, 'Arquivo exportado perdeu flags de minimização');
 
     await context.close();
   }
