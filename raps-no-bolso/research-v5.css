@@ -7,3 +7,5 @@
 .v5-consent-check input{margin-top:4px;min-width:20px;min-height:20px}
 .v5-consent-actions{display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end}
 @media(max-width:640px){.v5-consent-backdrop{padding:10px}.v5-consent-dialog{padding:18px;border-radius:15px}.v5-consent-actions{display:grid}.v5-consent-actions .btn{width:100%}}
+
+.v5-consent-actions .btn:disabled{opacity:.48;cursor:not-allowed;filter:grayscale(.35)}
