@@ -156,8 +156,139 @@
       </div>
     </div>`;
 
+  const CONSENT_VERSION = 'v5-local-1';
+  const CONSENT_KEY = 'raps-v5-local-consent';
+  const gatedForms = new Set([
+    'quickEvalForm',
+    'startTestForm',
+    'finishTestForm',
+    'suggestionForm',
+    'improvementForm',
+    'proposalForm'
+  ]);
+  let consentDialogOpen = false;
+
+  function readConsent() {
+    try {
+      const value = JSON.parse(sessionStorage.getItem(CONSENT_KEY) || 'null');
+      if (!value || value.accepted !== true || value.version !== CONSENT_VERSION) return null;
+      return value;
+    } catch {
+      return null;
+    }
+  }
+
+  function getConsentMeta() {
+    const consent = readConsent();
+    if (!consent) return null;
+    return {
+      consentVersion: consent.version,
+      consentAt: consent.acceptedAt,
+      collectionMode: 'local-voluntary'
+    };
+  }
+
+  function saveConsent() {
+    const value = {
+      accepted: true,
+      version: CONSENT_VERSION,
+      acceptedAt: new Date().toISOString()
+    };
+    sessionStorage.setItem(CONSENT_KEY, JSON.stringify(value));
+    return value;
+  }
+
+  function closeConsentDialog() {
+    document.getElementById('v5ConsentBackdrop')?.remove();
+    consentDialogOpen = false;
+  }
+
+  function askConsent(onAccept) {
+    if (readConsent()) {
+      onAccept();
+      return;
+    }
+    if (consentDialogOpen) return;
+    consentDialogOpen = true;
+
+    const backdrop = document.createElement('div');
+    backdrop.id = 'v5ConsentBackdrop';
+    backdrop.className = 'v5-consent-backdrop';
+    backdrop.innerHTML = `
+      <section class="v5-consent-dialog" role="dialog" aria-modal="true" aria-labelledby="v5ConsentTitle" aria-describedby="v5ConsentText">
+        <div class="eyebrow">Participação voluntária</div>
+        <h2 id="v5ConsentTitle">Antes de salvar uma resposta</h2>
+        <div id="v5ConsentText" class="v5-consent-copy">
+          <p>Este registro será salvo somente neste aparelho para avaliação e melhoria do protótipo. Você pode usar o RAPS no Bolso normalmente sem participar.</p>
+          <p>Não informe nome, CPF, CNS, prontuário, diagnóstico, medicação, endereço residencial ou outros dados clínicos/pessoais nos campos livres.</p>
+          <p><strong>Este aceite vale apenas para a gravação local desta sessão.</strong> Ele não autoriza, por si só, uso dos dados em uma pesquisa institucional futura.</p>
+        </div>
+        <label class="v5-consent-check"><input id="v5ConsentCheck" type="checkbox"> Li as informações e concordo voluntariamente em registrar respostas neste aparelho nesta sessão.</label>
+        <div class="v5-consent-actions">
+          <button class="btn secondary" id="v5ConsentCancel" type="button">Agora não</button>
+          <button class="btn" id="v5ConsentAccept" type="button" disabled>Concordo e continuar</button>
+        </div>
+      </section>`;
+    document.body.appendChild(backdrop);
+
+    const check = backdrop.querySelector('#v5ConsentCheck');
+    const accept = backdrop.querySelector('#v5ConsentAccept');
+    const cancel = backdrop.querySelector('#v5ConsentCancel');
+    check.addEventListener('change', () => { accept.disabled = !check.checked; });
+    cancel.addEventListener('click', closeConsentDialog);
+    accept.addEventListener('click', () => {
+      if (!check.checked) return;
+      saveConsent();
+      closeConsentDialog();
+      setTimeout(onAccept, 0);
+    });
+    backdrop.addEventListener('click', e => {
+      if (e.target === backdrop) closeConsentDialog();
+    });
+    check.focus();
+  }
+
+  function decorateConsentNotices() {
+    for (const formId of gatedForms) {
+      const form = document.getElementById(formId);
+      if (!form || form.previousElementSibling?.matches('[data-v5-consent-note]')) continue;
+      const note = document.createElement('section');
+      note.className = 'panel soft compact-panel';
+      note.dataset.v5ConsentNote = '1';
+      note.innerHTML = '<strong>Participação opcional</strong><p>Você pode continuar usando o aplicativo sem responder. Antes do primeiro registro desta sessão, o RAPS no Bolso mostrará o que será salvo e pedirá sua concordância.</p>';
+      form.parentNode?.insertBefore(note, form);
+    }
+  }
+
+  document.addEventListener('submit', e => {
+    const form = e.target;
+    if (!gatedForms.has(form.id) || readConsent()) return;
+    e.preventDefault();
+    e.stopImmediatePropagation();
+    askConsent(() => form.requestSubmit());
+  }, true);
+
+  document.addEventListener('click', e => {
+    const pulse = e.target.closest('[data-pulse-answer]');
+    if (!pulse || readConsent()) return;
+    e.preventDefault();
+    e.stopImmediatePropagation();
+    askConsent(() => pulse.click());
+  }, true);
+
+  const contentRoot = document.getElementById('conteudo');
+  if (contentRoot) {
+    new MutationObserver(() => setTimeout(decorateConsentNotices, 0))
+      .observe(contentRoot, { childList: true, subtree: true });
+  }
+  setTimeout(decorateConsentNotices, 0);
+
   window.RAPSResearchV5 = Object.freeze({
     version: 'v5',
-    collectionMode: 'local-voluntary'
+    consentVersion: CONSENT_VERSION,
+    collectionMode: 'local-voluntary',
+    hasConsent: () => Boolean(readConsent()),
+    getConsentMeta,
+    askConsent
   });
 })();
