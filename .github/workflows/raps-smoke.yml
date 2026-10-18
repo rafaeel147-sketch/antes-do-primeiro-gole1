@@ -57,6 +57,7 @@ jobs:
           test -f .github/scripts/raps-v5-smoke.mjs
           test -f raps-no-bolso/research-v5-addon.js
           test -f raps-no-bolso/research-v5.css
+          test -f raps-no-bolso/community-listening-v5-addon.js
 
       - name: Check addon loading and offline cache
         shell: bash
@@ -70,6 +71,7 @@ jobs:
           grep -Fq "./ubs-goiania-addon.js" raps-no-bolso/sw.js
           grep -Fq "./research-v5-addon.js" raps-no-bolso/sw.js
           grep -Fq "./research-v5.css" raps-no-bolso/sw.js
+          grep -Fq "./community-listening-v5-addon.js" raps-no-bolso/sw.js
           grep -Eq "raps-no-bolso-v[0-9]+" raps-no-bolso/sw.js
 
       - name: Check Encontre o caminho route integrity
