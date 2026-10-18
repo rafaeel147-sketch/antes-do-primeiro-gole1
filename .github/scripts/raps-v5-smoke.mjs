@@ -8,12 +8,17 @@ function assert(condition, message) {
 
 async function readStore(page, dbName) {
   return page.evaluate(async ({ dbName }) => {
+    if (typeof indexedDB.databases === 'function') {
+      const databases = await indexedDB.databases();
+      if (!databases.some(db => db.name === dbName)) return [];
+    }
     const db = await new Promise((resolve, reject) => {
       const req = indexedDB.open(dbName, 1);
       req.onsuccess = () => resolve(req.result);
       req.onerror = () => reject(req.error);
     });
     try {
+      if (!db.objectStoreNames.contains('registros')) return [];
       return await new Promise((resolve, reject) => {
         const tx = db.transaction('registros', 'readonly');
         const req = tx.objectStore('registros').getAll();
