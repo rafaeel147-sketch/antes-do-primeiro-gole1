@@ -104,6 +104,14 @@ await page.selectOption('#serviceType', 'upa');
 await page.waitForTimeout(100);
 check(await page.locator('#serviceResults .service-card').count() >= 4, 'filtro UPA retorna pelo menos quatro unidades verificadas');
 
+await page.evaluate(() => {
+  window.__rapsServiceProximityTestCoordinates = {
+    '7304188': { lat: -16.7414, lng: -49.2847, municipio: 'GOIANIA' },
+    '7821379': { lat: -16.6030, lng: -49.3220, municipio: 'GOIANIA' },
+    '2339552': { lat: -16.6750, lng: -49.2050, municipio: 'GOIANIA' },
+    '2339528': { lat: -16.7150, lng: -49.2850, municipio: 'GOIANIA' }
+  };
+});
 await page.click('#useLocation');
 await page.waitForFunction(() => document.getElementById('useLocation')?.textContent?.includes('Localização ativada'));
 await page.waitForFunction(() => {
