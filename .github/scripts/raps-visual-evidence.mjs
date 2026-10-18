@@ -59,6 +59,25 @@ await page.fill('#ubsSearch', 'Estrela Dalva');
 await page.waitForTimeout(150);
 await capture('06-ubs-estrela-dalva.png');
 
+await goto('pesquisa-participativa');
+await capture('07-v5-pesquisa-participacao.png');
+
+await goto('avaliacao-rapida');
+await page.evaluate(() => window.RAPSResearchV5?.askConsent?.(() => {}));
+await page.waitForSelector('#v5ConsentBackdrop');
+await capture('08-v5-consentimento.png', false);
+await page.click('#v5ConsentCancel');
+
+await goto('escuta-comunitaria');
+await capture('09-v5-escuta-comunitaria.png');
+
+await goto('pesquisa-painel-agregado');
+await page.waitForFunction(() => Boolean(window.__rapsV5LastAggregate));
+await capture('10-v5-sintese-agregada.png');
+
+await goto('apresentacao-cientifica');
+await capture('11-v5-apresentacao-cientifica.png');
+
 await context.close();
 await browser.close();
 

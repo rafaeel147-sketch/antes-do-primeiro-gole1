@@ -170,11 +170,14 @@
     });
   }
   async function saveRecord(record){
+    const consent=window.RAPSResearchV5?.getConsentMeta?.();
+    if(!consent) throw new Error('consent-required');
+    const enriched={...record,...consent};
     const db=await openDb();
     return new Promise((resolve,reject)=>{
       const tx=db.transaction(STORE,'readwrite');
-      tx.objectStore(STORE).put(record);
-      tx.oncomplete=()=>{db.close();resolve(record)};
+      tx.objectStore(STORE).put(enriched);
+      tx.oncomplete=()=>{db.close();resolve(enriched)};
       tx.onerror=()=>{db.close();reject(tx.error)};
     });
   }
