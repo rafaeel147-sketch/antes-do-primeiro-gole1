@@ -8,15 +8,18 @@ on:
       - '.github/workflows/raps-smoke.yml'
       - '.github/scripts/raps-browser-smoke.mjs'
       - '.github/scripts/raps-visual-evidence.mjs'
+      - '.github/scripts/raps-v5-smoke.mjs'
   push:
     branches:
       - main
       - 'fix/raps-*'
+      - 'feat/raps-*'
     paths:
       - 'raps-no-bolso/**'
       - '.github/workflows/raps-smoke.yml'
       - '.github/scripts/raps-browser-smoke.mjs'
       - '.github/scripts/raps-visual-evidence.mjs'
+      - '.github/scripts/raps-v5-smoke.mjs'
   workflow_dispatch:
 
 permissions:
@@ -51,6 +54,9 @@ jobs:
           test -f raps-no-bolso/sw.js
           test -f .github/scripts/raps-browser-smoke.mjs
           test -f .github/scripts/raps-visual-evidence.mjs
+          test -f .github/scripts/raps-v5-smoke.mjs
+          test -f raps-no-bolso/research-v5-addon.js
+          test -f raps-no-bolso/research-v5.css
 
       - name: Check addon loading and offline cache
         shell: bash
@@ -62,7 +68,9 @@ jobs:
           grep -Fq "./fase4-safe-addon.js" raps-no-bolso/sw.js
           grep -Fq "./services-goiania-addon.js" raps-no-bolso/sw.js
           grep -Fq "./ubs-goiania-addon.js" raps-no-bolso/sw.js
-          grep -Fq "raps-no-bolso-v14" raps-no-bolso/sw.js
+          grep -Fq "./research-v5-addon.js" raps-no-bolso/sw.js
+          grep -Fq "./research-v5.css" raps-no-bolso/sw.js
+          grep -Eq "raps-no-bolso-v[0-9]+" raps-no-bolso/sw.js
 
       - name: Check Encontre o caminho route integrity
         shell: bash
@@ -186,6 +194,7 @@ jobs:
           done
           curl -fsS http://127.0.0.1:4173/raps-no-bolso/ >/dev/null
           node .github/scripts/raps-browser-smoke.mjs
+          node .github/scripts/raps-v5-smoke.mjs
           node .github/scripts/raps-visual-evidence.mjs
 
       - name: Upload visual evidence
