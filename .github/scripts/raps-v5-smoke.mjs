@@ -127,6 +127,75 @@ try {
     await context.close();
   }
 
+
+  {
+    const context = await browser.newContext({ viewport: { width: 390, height: 844 } });
+    const page = await context.newPage();
+
+    await page.goto(base + '?p=escuta-comunitaria', { waitUntil: 'networkidle' });
+    assert((await page.locator('h1').innerText()).includes('Escuta comunitária'), 'Página de escuta comunitária não abriu');
+    assert(await page.locator('[data-v5-consent-note]').count(), 'Escuta comunitária não recebeu aviso de participação opcional');
+
+    const forbiddenInputs = await page.locator(
+      '#communityListeningForm input[name="cpf"],' +
+      '#communityListeningForm input[name="cns"],' +
+      '#communityListeningForm input[name="nome"],' +
+      '#communityListeningForm input[name="diagnostico"],' +
+      '#communityListeningForm input[name="prontuario"],' +
+      '#communityListeningForm input[name="latitude"],' +
+      '#communityListeningForm input[name="longitude"]'
+    ).count();
+    assert(forbiddenInputs === 0, 'Escuta comunitária contém campo pessoal/clínico proibido');
+
+    await page.selectOption('#communityListeningForm select[name="role"]', 'usuario');
+    await page.selectOption('#communityListeningForm select[name="serviceContext"]', 'caps');
+    await setChecked(page, '#communityListeningForm input[name="barriers"][value="informacao"]');
+    await setChecked(page, '#communityListeningForm input[name="barriers"][value="espera"]');
+    await page.selectOption('#communityListeningForm select[name="accessExperience"]', 'dificil');
+    await page.selectOption('#communityListeningForm select[name="missingInfo"]', 'horarios_contatos');
+    await page.fill('#communityListeningForm textarea[name="missingDetail"]', 'MARCADOR_TEXTO_LIVRE_V5');
+    await page.fill('#communityListeningForm textarea[name="suggestion"]', 'Melhorar informação de horários.');
+    await page.locator('#communityListeningForm button[type="submit"]').click();
+
+    await page.waitForSelector('#v5ConsentBackdrop');
+    const beforeRows = await readStore(page, 'raps-no-bolso-participacao');
+    assert(beforeRows.filter(r => r.type === 'community-listening').length === 0, 'Escuta foi salva antes do consentimento');
+
+    await acceptConsent(page);
+    await page.waitForFunction(() => document.querySelector('#communityListeningFeedback')?.textContent?.includes('Escuta salva'));
+
+    const rows = await readStore(page, 'raps-no-bolso-participacao');
+    const listening = rows.filter(r => r.type === 'community-listening');
+    assert(listening.length === 1, `Esperado 1 registro de escuta, encontrados ${listening.length}`);
+    const record = listening[0];
+    assert(record.role === 'usuario', 'Papel da escuta não foi persistido');
+    assert(record.accessExperience === 'dificil', 'Experiência de acesso não foi persistida');
+    assert(Array.isArray(record.barriers) && record.barriers.includes('informacao') && record.barriers.includes('espera'), 'Barreiras estruturadas não foram persistidas');
+    assert(record.consentVersion === 'v5-local-1', 'Escuta sem versão de consentimento');
+    assert(record.collectionMode === 'local-voluntary', 'Escuta sem collectionMode local-voluntary');
+
+    for (const key of ['cpf','cns','nome','diagnostico','prontuario','latitude','longitude','lat','lng']) {
+      assert(!(key in record), `Campo proibido persistido na escuta: ${key}`);
+    }
+
+    await page.goto(base + '?p=pesquisa-painel-agregado', { waitUntil: 'networkidle' });
+    await page.waitForFunction(() => Boolean(window.__rapsV5LastAggregate));
+    const aggregate = await page.evaluate(() => window.__rapsV5LastAggregate);
+    assert(aggregate.communityListening.total === 1, 'Síntese agregada não contabilizou a escuta');
+    assert(aggregate.communityListening.barriers['Informação insuficiente/confusa'] === 1, 'Síntese não agregou barreira de informação');
+    assert(aggregate.communityListening.barriers['Tempo de espera'] === 1, 'Síntese não agregou barreira de espera');
+    assert(aggregate.privacy.freeTextIncluded === false, 'Agregado marcou texto livre como incluído');
+    assert(aggregate.privacy.recordIdsIncluded === false, 'Agregado marcou IDs como incluídos');
+    assert(aggregate.privacy.photosIncluded === false, 'Agregado marcou fotos como incluídas');
+    assert(aggregate.privacy.preciseLocationIncluded === false, 'Agregado marcou localização precisa como incluída');
+
+    const aggregateText = JSON.stringify(aggregate);
+    assert(!aggregateText.includes('MARCADOR_TEXTO_LIVRE_V5'), 'Texto livre vazou para a síntese agregada');
+    assert(!aggregateText.includes(record.id), 'ID individual vazou para a síntese agregada');
+
+    await context.close();
+  }
+
   console.log('RAPS V5 consent browser smoke: PASS');
 } finally {
   await browser.close();
