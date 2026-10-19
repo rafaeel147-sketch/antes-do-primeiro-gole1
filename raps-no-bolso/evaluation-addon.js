@@ -273,19 +273,6 @@
     if(container)container.innerHTML='<strong>Obrigado.</strong> Esta resposta ficou salva somente neste aparelho para ajudar a revisar esta página.';
   }
 
-  function injectPagePulse(){
-    const route=currentRoute();
-    if(route.startsWith('avaliacao'))return;
-    const content=document.getElementById('conteudo');
-    const page=content?.querySelector('.page');
-    if(!page || page.querySelector('[data-eval-pulse]'))return;
-    const box=document.createElement('section');
-    box.className='panel soft eval-pulse';
-    box.dataset.evalPulse='1';
-    box.innerHTML=`<div><strong>Esta página ajudou você a saber o que fazer?</strong><small>Resposta local, sem identificação.</small></div><div class="pulse-actions"><button type="button" data-pulse-answer="sim">Sim</button><button type="button" data-pulse-answer="parcial">Mais ou menos</button><button type="button" data-pulse-answer="nao">Não</button>${link('avaliacao-rapida','Detalhar','mini-action')}</div>`;
-    page.appendChild(box);
-  }
-
   function injectActiveTestBar(){
     document.getElementById('activeEvalBar')?.remove();
     const active=getActiveTest();
@@ -298,7 +285,7 @@
   }
 
   function refreshEvalUi(){
-    setTimeout(()=>{injectPagePulse();injectActiveTestBar();hydratePanel();},0);
+    setTimeout(()=>{injectActiveTestBar();hydratePanel();},0);
   }
 
   document.addEventListener('submit',async e=>{
@@ -379,7 +366,7 @@
   }
 
   window.addEventListener('popstate',refreshEvalUi);
-  const observer=new MutationObserver(()=>{injectPagePulse();injectActiveTestBar();});
+  const observer=new MutationObserver(()=>{injectActiveTestBar();});
   const content=document.getElementById('conteudo');
   if(content)observer.observe(content,{childList:true});
   refreshEvalUi();

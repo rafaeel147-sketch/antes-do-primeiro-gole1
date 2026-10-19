@@ -107,6 +107,7 @@ try {
     const context = await browser.newContext({ viewport: { width: 390, height: 844 } });
     const page = await context.newPage();
     await page.goto(base + '?p=participacao-sugerir', { waitUntil: 'networkidle' });
+    assert(await page.locator('[data-post-save-evaluation]').count() === 0, 'Avaliação apareceu antes de salvar a contribuição');
 
     assert(await page.locator('[data-v5-consent-note]').count(), 'Aviso de participação opcional não foi injetado');
     const forbidden = await page.locator('#suggestionForm input[name="cpf"], #suggestionForm input[name="cns"], #suggestionForm input[name="nome"], #suggestionForm input[name="diagnostico"], #suggestionForm input[name="prontuario"]').count();
@@ -120,6 +121,7 @@ try {
 
     await page.waitForSelector('#v5ConsentBackdrop');
     assert(!(await page.locator('#suggestionFeedback').innerText()).includes('salva'), 'Participação foi salva antes do consentimento');
+    assert(await page.locator('[data-post-save-evaluation]').count() === 0, 'Avaliação apareceu antes do consentimento e da gravação');
     await acceptConsent(page);
     await page.waitForFunction(() => document.querySelector('#suggestionFeedback')?.textContent?.includes('salva'));
 
@@ -129,6 +131,11 @@ try {
     assert(record.consentVersion === 'v5-local-1', 'Registro de participação sem versão de consentimento');
     assert(record.collectionMode === 'local-voluntary', 'Registro de participação sem modo local-voluntary');
     assert(Boolean(record.consentAt), 'Registro de participação sem timestamp de consentimento');
+    assert(await page.locator('[data-post-save-evaluation]').count() === 1, 'Contribuição salva não ofereceu avaliação opcional');
+    await page.locator('[data-dismiss-evaluation]').click();
+    assert(await page.locator('[data-post-save-evaluation]').count() === 0, 'Agora não não dispensou a avaliação');
+    assert((await readStore(page, 'raps-no-bolso-participacao')).length === 1, 'Dispensar avaliação alterou a contribuição salva');
+    assert((await readStore(page, 'raps-no-bolso-avaliacao')).length === 0, 'Dispensar avaliação criou resposta indevida');
 
     await context.close();
   }

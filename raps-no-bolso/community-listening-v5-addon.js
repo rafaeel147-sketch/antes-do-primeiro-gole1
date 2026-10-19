@@ -410,6 +410,7 @@
       });
       form.reset();
       document.getElementById('communityListeningFeedback').innerHTML = '<div class="panel success">✓ Escuta salva somente neste aparelho. Nenhuma interpretação clínica foi produzida.</div>';
+      window.RAPSPostSave?.('communityListeningFeedback');
     } catch (error) {
       document.getElementById('communityListeningFeedback').innerHTML = '<div class="panel danger">Não foi possível salvar a escuta neste navegador.</div>';
       console.error(error);

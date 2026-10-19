@@ -42,6 +42,24 @@ async function goto(route = '') {
 
 await goto();
 await page.waitForSelector('#speakPage');
+await page.waitForFunction(() => Array.isArray(window.__rapsAddonLoadFailures));
+
+check(await page.locator('.home-grid .nav-card').count() === 4, 'início oferece quatro escolhas principais');
+check(await page.locator('[data-eval-pulse], [data-post-save-evaluation]').count() === 0, 'início não solicita avaliação antes de uma tarefa');
+check(await page.locator('.home-grid a[data-route="avaliacao"]').count() === 0, 'avaliação não ocupa um cartão principal');
+check(await page.locator('a[href="tel:192"]').count() > 0, 'emergência permanece acessível no início');
+for (const width of [320,390,1024]) {
+  await page.setViewportSize({width,height:844});
+  check(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), `início não transborda em ${width}px`);
+}
+await page.setViewportSize({width:390,height:844});
+
+await page.locator('.home-grid a[data-route="onde-ajuda"]').click();
+check(await page.locator('.task-grid a[data-route="ubs-goiania"]').count() === 1, 'busca de atendimento oferece diretório de UBS diretamente');
+await page.locator('.task-grid a[data-route="ubs-goiania"]').click();
+await page.waitForSelector('#ubsSearch');
+check(await page.locator('#ubsSearch').isVisible(), 'Encontrar uma UBS abre a busca de unidades');
+await goto();
 
 check(await page.locator('#fontDown').isVisible(), 'A− está visível no viewport mobile');
 check(await page.locator('#fontUp').isVisible(), 'A+ está visível no viewport mobile');
@@ -67,8 +85,15 @@ check(!(await page.locator('body').evaluate(el => el.classList.contains('high-co
 
 await page.click('#menuButton');
 check(await page.locator('#drawer').evaluate(el => el.classList.contains('open')), 'menu lateral abre');
+check(await page.locator('#closeMenu').evaluate(el => document.activeElement === el), 'menu recebe foco ao abrir');
+check(await page.getByRole('link',{name:'Pesquisador — abrir Cidade Unida',exact:true}).getAttribute('href') === 'https://cidade-unida.vercel.app/', 'Pesquisador aponta diretamente para Cidade Unida');
 await page.click('#closeMenu');
 check(!(await page.locator('#drawer').evaluate(el => el.classList.contains('open'))), 'menu lateral fecha');
+check(await page.locator('#drawer').evaluate(el => el.inert), 'menu fechado não recebe navegação pelo teclado');
+
+await goto('dados-locais');
+check(await page.locator('.task-grid a[data-route="pesquisa-painel-agregado"]').count() === 1, 'área de dados mantém acesso à exportação agregada');
+check(await page.locator('.task-grid a[data-route="participacao-demandas"]').count() === 1, 'área de dados mantém acesso à exportação de participação');
 
 await goto('encontre-caminho');
 await page.click('[data-path-key="recaida"]');
@@ -87,12 +112,14 @@ await goto('ad-abstinencia');
 check((await page.locator('h1').first().innerText()).includes('Estou com abstinência'), 'rota canônica ad-abstinencia funciona');
 
 await goto('direitos-atendimento');
+await page.locator('#conteudo details > summary').evaluateAll(items => items.forEach(item => { item.parentElement.open = true; }));
 const rightsText = await page.locator('#conteudo').innerText();
 check(rightsText.includes('Não possuir ou não portar documento com o número do CPF ou CNS não é, por si só, impedimento ao atendimento.'), 'página de direitos renderiza a regra atual de CPF/CNS');
 check(rightsText.includes('art. 258'), 'página de direitos renderiza a ressalva do art. 258');
 check(!rightsText.includes('Portaria GM/MS nº 940/2011, art. 13'), 'página final de direitos não exibe mais a orientação antiga da Portaria 940/2011');
 
 await goto('onde-ajuda');
+await page.locator('#serviceExplanation > summary').click();
 const helpText = await page.locator('#conteudo').innerText();
 check(helpText.includes('Sem o número do CPF/CNS?'), 'Onde buscar ajuda usa o cabeçalho atualizado de CPF/CNS');
 check(helpText.includes('outro documento válido'), 'Onde buscar ajuda renderiza a regra atual de identificação');

@@ -63,7 +63,7 @@
   </header>
 
   <div class="drawer-backdrop" id="drawerBackdrop" hidden></div>
-  <aside class="drawer" id="drawer" aria-label="Menu principal" aria-hidden="true">
+  <aside class="drawer" id="drawer" role="dialog" aria-modal="true" aria-label="Menu principal" aria-hidden="true" inert>
     <div class="drawer-head">
       <strong>Escolha uma área</strong>
       <button type="button" id="closeMenu" aria-label="Fechar menu">×</button>
@@ -74,36 +74,20 @@
 
   <main id="conteudo" tabindex="-1" aria-live="polite">
     <div class="page">
-      <section class="hero">
-        <div class="hero-main">
-          <div class="eyebrow">Informação simples para decisões reais</div>
-          <h1>RAPS no Bolso: direitos, saúde mental e cuidado no SUS</h1>
-          <p class="lead">Guia educativo gratuito para entender a Rede de Atenção Psicossocial, conhecer direitos, reduzir riscos e identificar caminhos de cuidado sem julgamento.</p>
-          <div class="hero-actions">
-            <a class="btn" href="?p=direitos">Ver direitos no SUS e na saúde mental</a>
-            <a class="btn secondary" href="?p=onde-ajuda">Onde buscar ajuda</a>
-          </div>
-        </div>
-        <div class="hero-side">
-          <div><span class="badge">PROTÓTIPO EDUCATIVO</span><h2 style="margin-top:14px">Rede, não labirinto.</h2><p>O RAPS no Bolso explica portas de cuidado e direitos com linguagem acessível. Não faz diagnóstico e não substitui atendimento profissional.</p></div>
-        </div>
+      <section class="home-intro">
+        <div class="eyebrow">Seu caminho no SUS</div>
+        <h1>O que você procura agora?</h1>
+        <p class="lead">Encontre atendimento, entenda seus direitos ou prepare uma contribuição. Um passo de cada vez.</p>
       </section>
-      <section class="panel">
-        <h2>O que você encontra aqui</h2>
-        <ul class="law-list">
-          <li><strong>Direitos:</strong> informação sobre atendimento no SUS, saúde mental, sigilo, acolhimento e OuvSUS.</li>
-          <li><strong>CAPS e RAPS:</strong> explicação sobre a Rede de Atenção Psicossocial e diferentes portas de cuidado.</li>
-          <li><strong>Álcool e outras drogas:</strong> informação para quem quer parar, reduzir ou diminuir riscos, sem exigir abstinência como porta de entrada.</li>
-          <li><strong>Redução de danos:</strong> estratégias educativas para diminuir riscos e proteger a vida.</li>
-          <li><strong>Crise e ansiedade:</strong> orientações gerais para reconhecer situações que precisam de cuidado e urgência.</li>
-          <li><strong>Família e rede de apoio:</strong> formas de apoiar sem humilhar, vigiar ou transformar toda conversa em cobrança.</li>
-        </ul>
+      <section class="nav-grid home-grid" aria-label="Escolha por necessidade">
+        <a class="nav-card" href="?p=crise"><span class="icon-square" aria-hidden="true">💙</span><span><strong>Preciso de ajuda agora</strong><p>Orientações para um momento difícil e acesso à urgência.</p></span><span class="go" aria-hidden="true">›</span></a>
+        <a class="nav-card" href="?p=onde-ajuda"><span class="icon-square" aria-hidden="true">📍</span><span><strong>Encontrar atendimento</strong><p>Busque UBS, CAPS e serviços de urgência em Goiânia.</p></span><span class="go" aria-hidden="true">›</span></a>
+        <a class="nav-card" href="?p=orientacoes"><span class="icon-square" aria-hidden="true">🧭</span><span><strong>Direitos e orientações</strong><p>Cuidado, direitos e apoio em linguagem simples.</p></span><span class="go" aria-hidden="true">›</span></a>
+        <a class="nav-card" href="?p=participe-sus"><span class="icon-square" aria-hidden="true">💬</span><span><strong>Participar e contribuir</strong><p>Organize sugestões e acompanhe seus registros locais.</p></span><span class="go" aria-hidden="true">›</span></a>
       </section>
-      <section class="panel soft">
-        <h2>Conteúdo baseado em fontes oficiais</h2>
-        <p>As referências incluem Ministério da Saúde, Conselho Nacional de Saúde, legislação federal, INCA e canais oficiais do SUS. Serviços locais, endereços e horários só devem ser publicados quando houver fonte responsável e data de verificação.</p>
-        <p><a href="?p=fontes">Consultar fontes e atualização</a> • <a href="../">Conhecer o projeto Antes do Primeiro Gole</a></p>
-      </section>
+      <aside class="home-emergency"><p><strong>É uma emergência?</strong> Ligue para o SAMU.</p><a class="btn danger" href="tel:192">Ligar 192</a></aside>
+      <p class="home-note">Guia educativo gratuito. Não substitui atendimento profissional. Informações sobre o projeto, dados e pesquisa estão no menu ☰.</p>
+      <noscript><p>Ative o JavaScript para usar os filtros e as páginas deste aplicativo. Para informações sobre o projeto, <a href="../">acesse Antes do Primeiro Gole</a>.</p></noscript>
     </div>
   </main>
 

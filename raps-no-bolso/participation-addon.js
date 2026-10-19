@@ -349,6 +349,7 @@
       if(form.id==='suggestionForm')await handleSuggestion(form);
       if(form.id==='improvementForm')await handleImprovement(form);
       if(form.id==='proposalForm')await handleProposal(form);
+      window.RAPSPostSave?.(form.id.replace('Form','Feedback'));
     }catch(err){
       const feedback=document.getElementById(form.id.replace('Form','Feedback'));
       if(feedback)feedback.innerHTML='<div class="panel danger">Não foi possível salvar. Verifique o espaço disponível no aparelho e tente novamente.</div>';

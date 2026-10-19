@@ -59,26 +59,21 @@ function sideBox(title, body, links=[]){return `<aside class="panel soft"><h3>${
 const pages = {
   inicio: () => `
     <div class="page">
-      ${emergencyStrip()}
-      <section class="hero">
-        <div class="hero-main">
-          <div class="eyebrow">Informação simples para decisões reais</div>
+      <section class="home-intro">
+          <div class="eyebrow">Seu caminho no SUS</div>
           <h1>O que você procura agora?</h1>
-          <p class="lead">Escolha uma área. Cada opção abre um caminho próprio, com informação curta primeiro e detalhes quando você quiser.</p>
-          <div class="hero-actions">
-            ${link('direitos','Ver meus direitos','btn')}
-            ${link('parar-fumar','Quero parar de fumar','btn secondary')}
-          </div>
-        </div>
-        <div class="hero-side">
-          <div><span class="badge">PROTÓTIPO EDUCATIVO</span><h2 style="margin-top:14px">Rede, não labirinto.</h2><p>Você não precisa decorar qual serviço faz o quê. O aplicativo explica as portas de cuidado sem fazer diagnóstico ou prometer atendimento.</p></div>
-          <div class="mini-box"><strong>Sem cadastro clínico</strong><br><small>Esta versão não pede relato de consumo, prontuário ou localização.</small></div>
-        </div>
+          <p class="lead">Encontre atendimento, entenda seus direitos ou prepare uma contribuição. Um passo de cada vez.</p>
       </section>
-      <div class="section-head"><div><div class="eyebrow">Menu principal</div><h2>Escolha por necessidade</h2></div><p>Os cartões abaixo levam para conteúdos separados. Nada de uma página única interminável.</p></div>
-      <section class="nav-grid">
-        ${menuItems.filter(x=>!['inicio','fontes'].includes(x[0])).map(([r,i,t,d])=>`<a class="nav-card" href="?p=${r}" data-route="${r}"><span class="icon-square" aria-hidden="true">${i}</span><span><strong>${t}</strong><p>${d}</p></span><span class="go">›</span></a>`).join('')}
+      <section class="nav-grid home-grid" aria-label="Escolha por necessidade">
+        ${[
+          ['crise','💙','Preciso de ajuda agora','Orientações para um momento difícil e acesso à urgência.'],
+          ['onde-ajuda','📍','Encontrar atendimento','Busque UBS, CAPS e serviços de urgência em Goiânia.'],
+          ['orientacoes','🧭','Direitos e orientações','Cuidado, direitos e apoio em linguagem simples.'],
+          ['participe-sus','💬','Participar e contribuir','Organize sugestões e acompanhe seus registros locais.']
+        ].map(([r,i,t,d])=>`<a class="nav-card" href="?p=${r}" data-route="${r}"><span class="icon-square" aria-hidden="true">${i}</span><span><strong>${t}</strong><p>${d}</p></span><span class="go" aria-hidden="true">›</span></a>`).join('')}
       </section>
+      <aside class="home-emergency"><p><strong>É uma emergência?</strong> Ligue para o SAMU.</p><a class="btn danger" href="tel:192">Ligar 192</a></aside>
+      <p class="home-note">Guia educativo gratuito. Não substitui atendimento profissional. Informações sobre o projeto, dados e pesquisa estão no menu ☰.</p>
     </div>`,
 
   direitos: () => `
@@ -274,8 +269,18 @@ function currentRoute(){
 }
 function renderNav(){
   const active=currentRoute();
-  document.getElementById('drawerNav').innerHTML=menuItems.map(([r,i,t])=>`<a class="drawer-link ${active===r?'active':''}" href="?p=${r}" data-route="${r}"><span class="drawer-icon" aria-hidden="true">${i}</span><span>${t}</span><span class="drawer-arrow">›</span></a>`).join('')
-    + '<a class="drawer-link" href="https://cidade-unida.vercel.app/" aria-label="Pesquisador — abrir Cidade Unida"><span class="drawer-icon" aria-hidden="true">🔬</span><span>Pesquisador</span><span class="drawer-arrow" aria-hidden="true">↗</span></a>';
+  const navItem=([r,i,t])=>pages[r]?`<a class="drawer-link ${active===r?'active':''}" ${active===r?'aria-current="page"':''} href="?p=${r}" data-route="${r}"><span class="drawer-icon" aria-hidden="true">${i}</span><span>${t}</span><span class="drawer-arrow" aria-hidden="true">›</span></a>`:'';
+  const group=(title,items)=>`<details class="drawer-group" ${items.some(([r])=>r===active)?'open':''}><summary>${title}</summary>${items.map(navItem).join('')}</details>`;
+  document.getElementById('drawerNav').innerHTML=[
+    ['inicio','🏠','Início'],['crise','💙','Preciso de ajuda agora'],['onde-ajuda','📍','Encontrar atendimento'],
+    ['orientacoes','🧭','Direitos e orientações'],['participe-sus','💬','Participar e contribuir']
+  ].map(navItem).join('')
+    + '<a class="drawer-link researcher-link" href="https://cidade-unida.vercel.app/" aria-label="Pesquisador — abrir Cidade Unida"><span class="drawer-icon" aria-hidden="true">🔬</span><span>Pesquisador<small>Cidade Unida</small></span><span class="drawer-arrow" aria-hidden="true">↗</span></a>'
+    + group('Mais orientações',menuItems.filter(([r])=>['direitos','parar-fumar','alcool-drogas','reducao-danos','encontre-caminho','servicos-goiania','ubs-goiania','raps','ouvsus','lai-sic','familia'].includes(r)))
+    + group('Dados e projeto',[
+      ['dados-locais','📥','Dados e exportação'],['avaliacao','✓','Avaliar o aplicativo'],
+      ['pesquisa-participativa','🔬','Pesquisa e participação'],['fontes','📚','Fontes e atualização'],['privacidade','🔒','Privacidade']
+    ]);
 }
 function render(route=currentRoute(), push=false){
   if(!pages[route]) route='inicio';
@@ -284,7 +289,7 @@ function render(route=currentRoute(), push=false){
     history.pushState({route},'',url);
   }
   document.getElementById('conteudo').innerHTML=pages[route]();
-  document.title=`${route==='inicio'?'RAPS no Bolso':menuItems.find(x=>x[0]===route)?.[2] || 'RAPS no Bolso'} — RAPS no Bolso`;
+  document.title=route==='inicio'?'RAPS no Bolso':`${document.querySelector('#conteudo h1')?.textContent || 'RAPS no Bolso'} — RAPS no Bolso`;
   renderNav();
   closeDrawer();
   window.scrollTo({top:0,behavior:'instant'});
@@ -294,12 +299,37 @@ function render(route=currentRoute(), push=false){
 const drawer=document.getElementById('drawer');
 const backdrop=document.getElementById('drawerBackdrop');
 const menuButton=document.getElementById('menuButton');
-function openDrawer(){drawer.classList.add('open');drawer.setAttribute('aria-hidden','false');backdrop.hidden=false;menuButton.setAttribute('aria-expanded','true');document.body.style.overflow='hidden'}
-function closeDrawer(){drawer.classList.remove('open');drawer.setAttribute('aria-hidden','true');backdrop.hidden=true;menuButton.setAttribute('aria-expanded','false');document.body.style.overflow=''}
+drawer.inert=true;
+function openDrawer(){
+  drawer.inert=false;
+  drawer.classList.add('open');
+  drawer.setAttribute('aria-hidden','false');
+  backdrop.hidden=false;
+  menuButton.setAttribute('aria-expanded','true');
+  document.body.style.overflow='hidden';
+  document.getElementById('closeMenu').focus();
+}
+function closeDrawer(){
+  const wasOpen=drawer.classList.contains('open');
+  if(wasOpen)menuButton.focus();
+  drawer.classList.remove('open');
+  drawer.setAttribute('aria-hidden','true');
+  drawer.inert=true;
+  backdrop.hidden=true;
+  menuButton.setAttribute('aria-expanded','false');
+  document.body.style.overflow='';
+}
 menuButton.addEventListener('click',()=>drawer.classList.contains('open')?closeDrawer():openDrawer());
 document.getElementById('closeMenu').addEventListener('click',closeDrawer);
 backdrop.addEventListener('click',closeDrawer);
-document.addEventListener('keydown',e=>{if(e.key==='Escape')closeDrawer()});
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape')closeDrawer();
+  if(e.key!=='Tab'||!drawer.classList.contains('open'))return;
+  const controls=[...drawer.querySelectorAll('a,button,summary')].filter(el=>el.getClientRects().length);
+  const first=controls[0],last=controls[controls.length-1];
+  if(e.shiftKey&&document.activeElement===first){e.preventDefault();last?.focus()}
+  else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first?.focus()}
+});
 
 document.addEventListener('click',e=>{
   const a=e.target.closest('[data-route]');

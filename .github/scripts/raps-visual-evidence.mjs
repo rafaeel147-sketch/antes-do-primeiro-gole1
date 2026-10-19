@@ -30,9 +30,9 @@ async function capture(name, fullPage = true) {
 }
 
 await goto();
-const sectionHeadDirection = await page.locator('.section-head').evaluate(el => getComputedStyle(el).flexDirection);
-if (sectionHeadDirection !== 'column') {
-  throw new Error(`section-head mobile deveria ser column; recebido: ${sectionHeadDirection}`);
+const homeColumns = await page.locator('.home-grid').evaluate(el => getComputedStyle(el).gridTemplateColumns.split(' ').length);
+if (homeColumns !== 1 || await page.locator('.home-grid .nav-card').count() !== 4) {
+  throw new Error('Home mobile deve mostrar quatro escolhas em uma coluna');
 }
 await capture('01-home-mobile.png');
 
