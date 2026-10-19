@@ -274,7 +274,8 @@ function currentRoute(){
 }
 function renderNav(){
   const active=currentRoute();
-  document.getElementById('drawerNav').innerHTML=menuItems.map(([r,i,t])=>`<a class="drawer-link ${active===r?'active':''}" href="?p=${r}" data-route="${r}"><span class="drawer-icon" aria-hidden="true">${i}</span><span>${t}</span><span class="drawer-arrow">›</span></a>`).join('');
+  document.getElementById('drawerNav').innerHTML=menuItems.map(([r,i,t])=>`<a class="drawer-link ${active===r?'active':''}" href="?p=${r}" data-route="${r}"><span class="drawer-icon" aria-hidden="true">${i}</span><span>${t}</span><span class="drawer-arrow">›</span></a>`).join('')
+    + '<a class="drawer-link" href="https://cidade-unida.vercel.app/" aria-label="Pesquisador — abrir Cidade Unida"><span class="drawer-icon" aria-hidden="true">🔬</span><span>Pesquisador</span><span class="drawer-arrow" aria-hidden="true">↗</span></a>';
 }
 function render(route=currentRoute(), push=false){
   if(!pages[route]) route='inicio';
