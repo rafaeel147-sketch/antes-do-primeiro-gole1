@@ -13,16 +13,22 @@ jobs:
       - uses: actions/checkout@v4
       - name: Baixar cartilha revisada e conferir PDF
         run: |
-          python -m pip install --quiet gdown pymupdf
+          python -m pip install --quiet gdown pymupdf requests
           mkdir -p international/assets
           python - <<'PY'
           import gdown, fitz, os
           url = 'https://drive.google.com/uc?id=1bYSutgzYgQ64uUYgl82vunQnELskgkdo'
           path = 'international/assets/antes-do-primeiro-gole-cartilha-v3.1-2026.pdf'
-          result = gdown.download(url, path, quiet=False, fuzzy=True)
+          print('Tentando obter PDF publico do Drive...')
+          result = gdown.download(id='1bYSutgzYgQ64uUYgl82vunQnELskgkdo', output=path, quiet=False, fuzzy=True)
           if not result or not os.path.exists(path):
               raise SystemExit('Falha ao obter PDF do Drive. Verifique o acesso publico.')
-          doc = fitz.open(path)
+          if os.path.getsize(path) < 100000:
+              raise SystemExit('O Drive retornou arquivo pequeno/invalido: verificar permissao de compartilhamento')
+          try:
+              doc = fitz.open(path)
+          except Exception as exc:
+              raise SystemExit('O Drive nao forneceu um PDF valido. Habilite acesso por link no arquivo.') from exc
           if len(doc) != 32:
               raise SystemExit(f'PDF inesperado: {len(doc)} paginas, esperado 32')
           doc[2].get_pixmap(matrix=fitz.Matrix(1.7, 1.7), alpha=False).save('international/assets/cartilha-v3.1-capa.png')
@@ -33,4 +39,8 @@ jobs:
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add international/assets/antes-do-primeiro-gole-cartilha-v3.1-2026.pdf international/assets/cartilha-v3.1-capa.png
-          git diff --cached --quiet || (git commit -m 'Publish complete educational booklet PDF and current cover' && git push)
+          if ! git diff --cached --quiet; then
+            git commit -m 'Publish complete educational booklet PDF and current cover'
+            git pull --rebase origin main
+            git push origin HEAD:main
+          fi
