@@ -55,10 +55,25 @@ for (const width of [320,390,1024]) {
 await page.setViewportSize({width:390,height:844});
 
 await page.locator('.home-grid a[data-route="onde-ajuda"]').click();
-check(await page.locator('.task-grid a[data-route="ubs-goiania"]').count() === 1, 'busca de atendimento oferece diretório de UBS diretamente');
-await page.locator('.task-grid a[data-route="ubs-goiania"]').click();
+check(await page.locator('.priority-emergency a[href="tel:192"]').count() === 1, 'SAMU 192 permanece livre de exigência de GPS');
+const serviceOrder = await page.locator('[data-service-kind]').evaluateAll(items=>items.map(el=>el.dataset.serviceKind));
+check(JSON.stringify(serviceOrder) === JSON.stringify(['hospital','upa','caps','ubs']), 'serviços em ordem hospital, UPA, CAPS, UBS');
+await page.locator('[data-service-kind="ubs"]').click();
 await page.waitForSelector('#ubsSearch');
-check(await page.locator('#ubsSearch').isVisible(), 'Encontrar uma UBS abre a busca de unidades');
+check(await page.locator('#ubsSearch').isVisible(), 'Escolher UBS abre diretamente a busca de unidades');
+await goto('onde-ajuda');
+await page.locator('[data-service-kind="upa"]').click();
+await page.waitForSelector('#serviceResults');
+check(await page.locator('#serviceType').inputValue() === 'upa', 'escolher UPA aplica filtro de urgência diretamente');
+await goto('onde-ajuda');
+await page.locator('[data-service-kind="caps"]').click();
+await page.waitForSelector('#serviceResults');
+check(await page.locator('#serviceType').inputValue() === 'caps', 'escolher CAPS mostra a família de serviços CAPS');
+check(await page.locator('#serviceResults .service-card').count() > 0, 'filtro CAPS retorna serviços');
+await goto('onde-ajuda');
+await page.locator('[data-service-kind="hospital"]').click();
+check((await page.locator('h1').first().innerText()).includes('Hospital'), 'escolher hospital abre informações hospitalares');
+check(await page.locator('.priority-hospital-list article').count() === 2, 'hospitais exibem duas referências com fontes oficiais');
 await goto();
 
 check(await page.locator('#fontDown').isVisible(), 'A− está visível no viewport mobile');
