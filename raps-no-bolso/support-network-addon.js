@@ -346,10 +346,11 @@
   document.addEventListener('visibilitychange',()=>{if(!document.hidden)redrawFlow()});
   window.setInterval(()=> {
     if(!currentFlow||currentFlow.status!=='active')return;
+    const before=currentFlow.index;
     expireFlowIfNeeded();
+    if(before!==currentFlow.index){redrawFlow();return;}
     const count=get('supportCountdown');
-    if(!count){redrawFlow();return;}
-    if(currentFlow.index >= (currentFlow.demo?demoContacts:contactsForFlow()).length){redrawFlow();return;}
+    if(!count) return;
     count.textContent=Math.max(0,Math.ceil((currentFlow.deadline-Date.now())/1000));
   },1000);
   // Destino somente em memória desta sessão; app pode ser usado sem localização ou rede de apoio.
