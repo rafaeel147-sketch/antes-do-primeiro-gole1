@@ -149,8 +149,16 @@ await page.locator('#supportResetFlow').click();
 await page.locator('#supportStartDemo').click();
 check((await page.locator('.support-active-flow h2').innerText()).includes('Demonstração'), 'demonstração isolada tem status visível');
 check(await page.locator('[data-external-channel]').count() === 0, 'demonstração não possui links externos de envio');
+await page.evaluate(() => {
+  window.__supportRealNow = Date.now;
+  const base = Date.now();
+  Date.now = () => base + 61000;
+});
+await page.waitForFunction(() => document.querySelector('.support-active-flow h2')?.textContent?.includes('Contato 2'));
+await page.evaluate(() => { Date.now = window.__supportRealNow; });
+check((await page.locator('.support-active-flow h2').innerText()).includes('Contato 2'), 'prazo de um minuto avança automaticamente na interface sem envio externo');
 await page.locator('#supportNextContact').click();
-check((await page.locator('.support-active-flow h2').innerText()).includes('Contato 2'), 'demonstração avança ao próximo contato');
+check((await page.locator('.support-active-flow h2').innerText()).includes('Contato 3'), 'demonstração permite avançar manualmente ao contato seguinte');
 await page.locator('#supportMarkResponded').click();
 check((await page.locator('#supportFlowContainer').innerText()).includes('Resposta registrada pelo usuário'), 'resposta manual encerra escalonamento sem alegar confirmação automática');
 await page.locator('#supportResetFlow').click();
