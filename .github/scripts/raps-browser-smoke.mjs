@@ -185,8 +185,9 @@ try {
   check(await page.evaluate(() => Boolean(navigator.serviceWorker.controller)), 'service worker controla a página antes do teste offline');
   await context.setOffline(true);
   await page.goto(`${BASE}?p=ad-abstinencia`, { waitUntil: 'domcontentloaded' });
-  await page.waitForSelector('h1');
-  check((await page.locator('h1').first().innerText()).includes('Estou com abstinência'), 'rota principal continua disponível offline pelo service worker');
+  // O HTML inicial já contém um h1: esperar a rota renderizada evita falso negativo.
+  await page.waitForFunction(() => document.querySelector('#conteudo h1')?.textContent?.includes('Estou com abstinência'), null, { timeout: 10000 });
+  check((await page.locator('#conteudo h1').first().innerText()).includes('Estou com abstinência'), 'rota principal continua disponível offline pelo service worker');
   await context.setOffline(false);
 } catch (error) {
   await context.setOffline(false).catch(() => {});
