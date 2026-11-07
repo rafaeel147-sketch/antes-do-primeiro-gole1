@@ -73,7 +73,8 @@
     if (address && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(address)) {
       items.push('<a class="btn secondary" data-external-channel="E-mail" href="mailto:'+encodeURIComponent(address)+'?subject='+encodeURIComponent('Pedido de apoio — RAPS no Bolso')+'&body='+msg+'">Abrir e-mail</a>');
     }
-    return items.join('');
+    const preferred = navigator.onLine === false ? 'SMS' : ({whatsapp:'WhatsApp',sms:'SMS',email:'E-mail',telefone:'Telefone'})[c.channel] || 'WhatsApp';
+    return items.sort((a,b)=>Number(!a.includes('data-external-channel="'+preferred+'"'))-Number(!b.includes('data-external-channel="'+preferred+'"'))).join('');
   }
   function psychiatryCard() {
     return '<a class="nav-card priority-service-choice" href="?p=urgencia-psiquiatrica" data-route="urgencia-psiquiatrica" data-service-kind="psiquiatria"><span class="icon-square" aria-hidden="true">🧠</span><span><strong>Urgência psiquiátrica 24h</strong><p>Crise ou surto: orientação e atendimento no pronto-socorro psiquiátrico. Risco imediato: SAMU 192.</p></span><span class="go" aria-hidden="true">›</span></a>';
