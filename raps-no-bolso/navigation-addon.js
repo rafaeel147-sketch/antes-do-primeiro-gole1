@@ -25,24 +25,124 @@
     </details>
   </div>`;
 
-  // Mantém a explicação anterior, com as regras e referências, após os atalhos de busca.
+  // Acesso rápido organizado por necessidade; chamadas ao SAMU não dependem de GPS.
   const helpExplanation = pages['onde-ajuda'];
+  const hospitals = [
+    ['HUGO — Hospital de Urgências de Goiás','Urgências hospitalares de média e alta complexidade, com referência em trauma.','Avenida 31 de Março, s/n, Avenida Pedro Ludovico, Goiânia - GO','https://goias.gov.br/saude/hugo/'],
+    ['HUGOL — Hospital Estadual de Urgências','Urgências hospitalares especializadas. A via de entrada depende do quadro e da regulação.','Avenida Anhanguera, 14527, Setor Santos Dumont, Goiânia - GO','https://goias.gov.br/saude/hugol/']
+  ];
+  let hospitalPosition = null;
+  function hospitalRoute(address) {
+    const origin = hospitalPosition ? '&origin=' + encodeURIComponent(hospitalPosition.lat+','+hospitalPosition.lng) : '';
+    return 'https://www.google.com/maps/dir/?api=1'+origin+'&destination='+encodeURIComponent(address);
+  }
+  function priorityLink(route,icon,title,subtitle,kind) {
+    return `<a class="nav-card priority-service-choice" href="?p=${route}" data-route="${route}" data-service-kind="${kind}"><span class="icon-square" aria-hidden="true">${icon}</span><span><strong>${title}</strong><p>${subtitle}</p></span><span class="go" aria-hidden="true">›</span></a>`;
+  }
   pages['onde-ajuda'] = () => {
     const template = document.createElement('div');
     template.innerHTML = helpExplanation();
     const explanation = template.querySelector('.content-grid')?.outerHTML || '';
     return `<div class="page">
-      ${pageHead('Encontrar atendimento','Comece pelo tipo de serviço. Os diretórios abaixo são de Goiânia e mostram endereços, contatos e rotas.')}
-      ${cards([
-        ['ubs-goiania','📍','Encontrar uma UBS','Busque por nome, bairro ou distrito e veja endereço e horário informado.'],
-        ['servicos-goiania','🏥','Encontrar CAPS ou urgência','Consulte CAPS, UPAs e outros serviços; filtre pelo tipo de atendimento.']
-      ],'Buscar serviços em Goiânia')}
-      <section class="panel soft next-step"><h2>Não sei qual serviço procurar</h2><p>Compare caminhos a partir da sua necessidade.</p>${link('encontre-caminho','Me ajude a escolher','btn secondary')}</section>
-      ${emergencyStrip()}
-      <details class="panel disclosure" id="serviceExplanation"><summary>O que fazem UBS, CAPS, UPA e SAMU?</summary><div class="disclosure-body">${explanation}</div></details>
-      <p class="home-note">A localização é opcional. Você pode usar as listas sem GPS. Horários e disponibilidade devem ser confirmados com a unidade.</p>
+      ${pageHead('Encontre atendimento','Escolha pelo que você precisa agora. Use a busca por texto mesmo sem GPS.')}
+      <section class="panel priority-emergency">
+        <h2>Emergência ou risco à vida?</h2>
+        <p>Desmaio, convulsão, falta de ar intensa, dor forte no peito ou outra situação grave: ligue 192.</p>
+        <a class="btn danger priority-emergency-call" href="tel:192">📞 Ligar para o SAMU 192</a>
+        <p class="small">Não precisa ativar a localização do aplicativo para ligar.</p>
+      </section>
+      <h2 class="priority-section-title">Qual serviço você procura?</h2>
+      <section class="priority-service-grid" aria-label="Serviços apresentados pela urgência da necessidade">
+        ${priorityLink('hospitais-urgencia','🏥','Hospital / pronto-socorro','Casos que podem exigir hospital, cirurgia ou internação.','hospital')}
+        ${priorityLink('servicos-goiania','🚑','UPA 24h — urgência','Atendimento de urgência, avaliação, observação e encaminhamento.','upa')}
+        ${priorityLink('servicos-goiania','💙','CAPS / CAPS AD — saúde mental','Acolhimento, cuidado contínuo, álcool e outras drogas.','caps')}
+        ${priorityLink('ubs-goiania','🩺','UBS — posto de saúde','Consultas, vacinação e acompanhamento de rotina.','ubs')}
+      </section>
+      <section class="panel soft">
+        <h3>Localização opcional</h3>
+        <p>Ao escolher um serviço, seu navegador poderá pedir acesso à localização para ajudar nas rotas. Se você recusar, ainda poderá ver endereços e buscar por texto.</p>
+        <p class="small">A ordem destes botões não substitui avaliação clínica nem classificação de risco.</p>
+      </section>
+      <details class="panel disclosure"><summary>Não sei qual serviço procurar</summary>
+        ${link('encontre-caminho','Me ajude a escolher','btn secondary')}
+      </details>
+      <details class="panel disclosure" id="serviceExplanation">
+        <summary>O que fazem UBS, CAPS, UPA, SAMU e hospital?</summary>
+        <div class="disclosure-body">${explanation}</div>
+      </details>
+      <p class="home-note">Confirme horários e condições de atendimento na fonte oficial. O aplicativo não informa vagas nem fila em tempo real.</p>
     </div>`;
   };
+  pages['hospitais-urgencia'] = () => `<div class="page">
+    ${pageHead('Hospital / pronto-socorro','Referências hospitalares em Goiânia. Para situações graves, o SAMU 192 pode orientar o encaminhamento.','Atenção hospitalar')}
+    ${emergencyStrip()}
+    <section class="panel warning">
+      <h2>Importante</h2>
+      <p>Hospitais de referência podem atender por regulação. Esta lista não confirma vaga, atendimento imediato ou acesso irrestrito.</p>
+      <p id="hospitalLocationStatus" aria-live="polite">Localização não solicitada; rotas disponíveis por endereço.</p>
+      <button class="btn secondary" id="hospitalUseLocation" type="button">Usar minha localização (opcional)</button>
+    </section>
+    <section class="priority-hospital-list" aria-label="Hospitais com informações oficiais">
+      ${hospitals.map(([name,description,address,source])=>`<article class="panel">
+        <h2>${name}</h2><p>${description}</p><p><strong>Endereço:</strong> ${address}</p>
+        <div class="hero-actions">
+          <a class="btn" data-hospital-address="${address}" href="${hospitalRoute(address)}" target="_blank" rel="noopener noreferrer">Traçar rota</a>
+          <a class="btn secondary" href="${source}" target="_blank" rel="noopener noreferrer">Fonte oficial</a>
+        </div>
+      </article>`).join('')}
+    </section>
+    <section class="panel soft"><h2>Crise em saúde mental?</h2>
+      <p>Há também pronto-socorro psiquiátrico em Goiânia. Em risco imediato, ligue 192.</p>
+      ${link('servicos-goiania','Ver serviços de urgência psiquiátrica','btn secondary')}
+    </section>
+  </div>`;
+  function askHospitalLocation() {
+    const status = document.getElementById('hospitalLocationStatus');
+    if (hospitalPosition) {
+      if(status) status.textContent = 'Localização ativa nesta sessão para rotas.';
+      return;
+    }
+    if (!navigator.geolocation) {
+      if(status) status.textContent = 'Geolocalização indisponível; use o endereço.';
+      return;
+    }
+    if(status) status.textContent = 'Solicitando permissão de localização ao navegador…';
+    navigator.geolocation.getCurrentPosition(position => {
+      hospitalPosition = {lat:position.coords.latitude,lng:position.coords.longitude};
+      document.querySelectorAll('[data-hospital-address]').forEach(a=>a.href=hospitalRoute(a.dataset.hospitalAddress));
+      if(status) status.textContent = 'Localização autorizada. O aplicativo usará sua posição como origem ao abrir o mapa externo.';
+      const button = document.getElementById('hospitalUseLocation');
+      if(button) button.textContent = '✓ Localização ativada';
+    }, error => {
+      if(status) status.textContent = error.code===1
+        ? 'Localização não autorizada. Rotas por endereço continuam disponíveis.'
+        : 'Localização indisponível. Rotas por endereço continuam disponíveis.';
+    }, {enableHighAccuracy:false,timeout:10000,maximumAge:60000});
+  }
+  // O clique no serviço é explícito; GPS é solicitado em seguida, sem bloquear a lista.
+  document.addEventListener('click', event => {
+    const choice = event.target.closest('[data-service-kind]');
+    if(choice) {
+      const kind = choice.dataset.serviceKind;
+      if(kind==='hospital') askHospitalLocation();
+      if(kind==='upa'||kind==='caps') {
+        const select = document.getElementById('serviceType');
+        if(select){select.value=kind;select.dispatchEvent(new Event('change',{bubbles:true}));}
+        document.getElementById('useLocation')?.click();
+      }
+      if(kind==='ubs') document.getElementById('ubsUseLocation')?.click();
+    }
+    if(event.target.closest('#hospitalUseLocation')) askHospitalLocation();
+  });
+
+  // A entrada "Preciso de ajuda agora" deve chegar às opções de serviço sem percorrer o menu.
+  const previousCrisisPage = pages.crise;
+  pages.crise = () => previousCrisisPage().replace(
+    '<div class="content-grid">',
+    '<section class="panel soft priority-crisis-shortcut"><h2>Precisa localizar atendimento?</h2><p>Veja hospital, UPA, CAPS ou UBS e escolha um serviço. A busca por endereço funciona sem GPS.</p>' +
+      link('onde-ajuda','Encontrar atendimento agora','btn') +
+    '</section><div class="content-grid">'
+  );
 
   pages.direitos = () => `<div class="page">
     ${pageHead('Meus direitos','Comece pela situação que você está vivendo. Abra os detalhes de cada assunto quando precisar conferir a explicação e a base legal.')}

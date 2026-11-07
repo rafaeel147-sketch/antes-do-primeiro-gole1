@@ -49,7 +49,7 @@
     const only24 = Boolean(document.getElementById('service24h')?.checked);
     return services.filter(service => {
       const haystack = `${service.name} ${service.label} ${service.audience} ${service.address}`.toLocaleLowerCase('pt-BR');
-      return (!search || haystack.includes(search)) && (type === 'todos' || service.type === type) && (!only24 || service.open24);
+      return (!search || haystack.includes(search)) && (type === 'todos' || (type === 'caps' ? service.type.startsWith('caps-') : service.type === type)) && (!only24 || service.open24);
     });
   }
 
@@ -126,6 +126,7 @@
         <label><span>Buscar</span><input id="serviceSearch" type="search" autocomplete="off" placeholder="Ex.: álcool, criança, Jardim América, Noroeste"></label>
         <label><span>Tipo</span><select id="serviceType">
           <option value="todos">Todos</option>
+          <option value="caps">Todos os CAPS</option>
           <option value="caps-ad">CAPS AD</option>
           <option value="caps-transtorno">CAPS adulto</option>
           <option value="caps-infanto">CAPSi</option>
