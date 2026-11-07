@@ -120,3 +120,23 @@ a:focus-visible,button:focus-visible,summary:focus-visible{outline:3px solid var
   .task-grid .nav-card{grid-template-columns:44px minmax(0,1fr) auto;gap:12px}
   .task-grid .icon-square{width:44px;height:44px}
 }
+
+/* Fluxo de ajuda: a escolha por gravidade usa cartões de largura total e toque amplo. */
+.priority-emergency{border:2px solid #b42318;background:#fff7f5;margin-bottom:24px}
+.priority-emergency-call{min-height:52px;padding:12px 22px;font-size:1.05rem}
+.priority-emergency .small{color:var(--muted);margin-top:10px}
+.priority-section-title{margin:22px 0 14px;font-size:clamp(1.4rem,3vw,1.85rem)}
+.priority-service-grid,.priority-hospital-list{display:grid;grid-template-columns:1fr;gap:12px;margin-bottom:20px}
+.priority-service-choice{min-height:94px;grid-template-columns:56px minmax(0,1fr) auto;padding:18px}
+.priority-service-choice strong{font-size:1.1rem}
+.priority-service-choice p{font-size:.97rem;line-height:1.48}
+.priority-service-choice:focus-visible{outline:3px solid var(--brand-2);outline-offset:3px}
+.priority-hospital-list .hero-actions{margin-top:14px}
+body.high-contrast .priority-emergency{background:#121212;color:#fff;border-color:#fff}
+body.high-contrast .priority-service-choice:focus-visible{outline-color:#fff}
+@media(max-width:640px){
+  .priority-service-choice{padding:14px;gap:12px;min-height:88px}
+  .priority-service-choice p{font-size:.92rem}
+  .priority-emergency-call{width:100%}
+  .priority-hospital-list .hero-actions{display:grid;grid-template-columns:1fr}
+}
