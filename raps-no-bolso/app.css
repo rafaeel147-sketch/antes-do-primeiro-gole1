@@ -140,3 +140,32 @@ body.high-contrast .priority-service-choice:focus-visible{outline-color:#fff}
   .priority-emergency-call{width:100%}
   .priority-hospital-list .hero-actions{display:grid;grid-template-columns:1fr}
 }
+
+/* Rede de apoio — Goiânia (piloto), navegação acessível e sem cadastro obrigatório. */
+.support-first-entry{margin-bottom:20px;border:2px solid var(--brand-2)}
+.support-first-entry .hero-actions{margin:16px 0 12px}
+.support-contacts-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.support-contact{min-width:0;margin:0;display:grid;align-content:start;gap:12px}
+.support-contact legend{font-weight:850;padding:0 8px;color:var(--brand)}
+.support-contact label{display:grid;gap:6px;font-weight:650}
+.support-contact input:not([type="checkbox"]),.support-contact select,.support-form-bottom select{
+  width:100%;min-height:46px;padding:10px 12px;font:inherit;background:var(--surface);
+  color:var(--text);border:1px solid var(--border);border-radius:11px
+}
+.support-contact .support-check,.support-check{display:flex;align-items:flex-start;gap:10px;font-weight:600}
+.support-check input[type="checkbox"]{margin-top:5px;width:21px;height:21px;flex-shrink:0}
+.support-form-bottom{grid-column:1/-1;display:grid;gap:13px}
+.support-form-bottom>label:first-child{display:grid;gap:8px}
+.support-form-bottom select{max-width:230px}
+.support-form-bottom .hero-actions{margin-top:0}
+.support-active-flow{border:2px solid var(--brand);margin:18px 0}
+.support-active-message{border:1px solid var(--border);background:var(--surface-soft);padding:14px;border-radius:12px}
+.support-message-preview{white-space:pre-wrap;overflow-wrap:anywhere}
+.priority-crisis-psychiatric{border:2px solid var(--brand-2);margin-bottom:15px}
+.support-active-flow .hero-actions{margin-top:12px}
+#supportFlowContainer:empty{display:none}
+@media(max-width:720px){
+  .support-contacts-grid{grid-template-columns:minmax(0,1fr)}
+  .support-contact,.support-form-bottom{grid-column:1}
+  .support-active-flow .hero-actions,.support-first-entry .hero-actions{display:grid;grid-template-columns:1fr}
+}

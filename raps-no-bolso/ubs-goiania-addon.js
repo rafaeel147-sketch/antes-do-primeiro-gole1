@@ -144,6 +144,7 @@ SUL|CS|2339560|Parque Amazônia|Praça José Rodrigues de Morais Neto, s/n, Parq
       <div class="hero-actions">
         <a class="btn" href="${mapsRoute(unit)}" target="_blank" rel="noopener noreferrer">Traçar rota ↗</a>
         <a class="btn secondary" href="${SOURCE}" target="_blank" rel="noopener noreferrer">Fonte oficial ↗</a>
+         <a class="btn secondary" href="?p=rede-apoio-aviso" data-route="rede-apoio-aviso" data-support-name="${esc(unit.name)}" data-support-address="${esc(unit.address)}, Goiânia - GO">Avisar contato de confiança</a>
       </div>
     </article>`;
   }
