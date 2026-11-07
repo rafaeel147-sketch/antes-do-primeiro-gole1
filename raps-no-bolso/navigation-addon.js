@@ -135,6 +135,15 @@
     if(event.target.closest('#hospitalUseLocation')) askHospitalLocation();
   });
 
+  // A entrada "Preciso de ajuda agora" deve chegar às opções de serviço sem percorrer o menu.
+  const previousCrisisPage = pages.crise;
+  pages.crise = () => previousCrisisPage().replace(
+    '<div class="content-grid">',
+    '<section class="panel soft priority-crisis-shortcut"><h2>Precisa localizar atendimento?</h2><p>Veja hospital, UPA, CAPS ou UBS e escolha um serviço. A busca por endereço funciona sem GPS.</p>' +
+      link('onde-ajuda','Encontrar atendimento agora','btn') +
+    '</section><div class="content-grid">'
+  );
+
   pages.direitos = () => `<div class="page">
     ${pageHead('Meus direitos','Comece pela situação que você está vivendo. Abra os detalhes de cada assunto quando precisar conferir a explicação e a base legal.')}
     ${cards(rightsTopics,'Escolher um direito')}
