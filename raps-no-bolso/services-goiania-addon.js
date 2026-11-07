@@ -61,7 +61,7 @@
       <p><strong>Horário:</strong> ${escapeHtml(service.hours)}</p>
       <p><strong>Endereço:</strong> ${escapeHtml(service.address)}</p>
       <p><strong>Telefone:</strong> ${escapeHtml(service.displayPhone)}</p>
-      <div class="hero-actions">${phoneAction}<a class="btn" href="${mapsUrl(service)}" target="_blank" rel="noopener noreferrer">Traçar rota ↗</a><a class="btn secondary" href="${service.source}" target="_blank" rel="noopener noreferrer">Fonte oficial ↗</a></div>
+      <div class="hero-actions">${phoneAction}<a class="btn" href="${mapsUrl(service)}" target="_blank" rel="noopener noreferrer">Traçar rota ↗</a><a class="btn secondary" href="${service.source}" target="_blank" rel="noopener noreferrer">Fonte oficial ↗</a><a class="btn secondary" href="?p=rede-apoio-aviso" data-route="rede-apoio-aviso" data-support-name="${escapeHtml(service.name)}" data-support-address="${escapeHtml(service.address)}">Avisar contato de confiança</a></div>
     </article>`;
   }
 
