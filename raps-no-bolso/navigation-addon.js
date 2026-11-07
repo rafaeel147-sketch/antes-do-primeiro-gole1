@@ -88,6 +88,7 @@
         <div class="hero-actions">
           <a class="btn" data-hospital-address="${address}" href="${hospitalRoute(address)}" target="_blank" rel="noopener noreferrer">Traçar rota</a>
           <a class="btn secondary" href="${source}" target="_blank" rel="noopener noreferrer">Fonte oficial</a>
+          <a class="btn secondary" href="?p=rede-apoio-aviso" data-route="rede-apoio-aviso" data-support-name="${name}" data-support-address="${address}">Avisar contato de confiança</a>
         </div>
       </article>`).join('')}
     </section>
