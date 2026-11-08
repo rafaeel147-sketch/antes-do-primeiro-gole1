@@ -28,13 +28,140 @@
   // Acesso rápido organizado por necessidade; chamadas ao SAMU não dependem de GPS.
   const helpExplanation = pages['onde-ajuda'];
   const hospitals = [
-    ['HUGO — Hospital de Urgências de Goiás','Urgências hospitalares de média e alta complexidade, com referência em trauma.','Avenida 31 de Março, s/n, Avenida Pedro Ludovico, Goiânia - GO','https://goias.gov.br/saude/hugo/'],
-    ['HUGOL — Hospital Estadual de Urgências','Urgências hospitalares especializadas. A via de entrada depende do quadro e da regulação.','Avenida Anhanguera, 14527, Setor Santos Dumont, Goiânia - GO','https://goias.gov.br/saude/hugol/']
+    ['HUGO — Hospital de Urgências de Goiás','Urgências hospitalares de média e alta complexidade, com referência em trauma.','Avenida 31 de Março, s/n, Avenida Pedro Ludovico, Goiânia - GO','https://goias.gov.br/saude/hugo/','2338262'],
+    ['HUGOL — Hospital Estadual de Urgências','Urgências de média e alta complexidade, inclusive trauma. O acesso pode depender de regulação; proximidade não garante atendimento.','Avenida Anhanguera, 14527, Setor Santos Dumont, Goiânia - GO','https://goias.gov.br/saude/hugol/','7743068']
   ];
   let hospitalPosition = null;
   function hospitalRoute(address) {
     const origin = hospitalPosition ? '&origin=' + encodeURIComponent(hospitalPosition.lat+','+hospitalPosition.lng) : '';
     return 'https://www.google.com/maps/dir/?api=1'+origin+'&destination='+encodeURIComponent(address);
+  }
+  // Com GPS autorizado, ordenar HUGO/HUGOL por distância EM LINHA RETA.
+  // Coordenadas somente de CNES confirmado; sem GPS não há inferência nem ranking.
+  const HOSPITAL_GEO_RESOURCE = '7559175a-98ac-4719-bf30-5e6455ba57c5';
+  const HOSPITAL_GEO_API = 'https://dadosabertos.go.gov.br/pt_BR/api/3/action/datastore_search_sql';
+  const HOSPITAL_GEO_SOURCE = 'https://dadosabertos.go.gov.br/dataset/cnes-cadastro-nacional-de-estabelecimentos-de-saude/resource/7559175a-98ac-4719-bf30-5e6455ba57c5';
+  const hospitalCoordinates = new Map();
+  let hospitalCoordinatesTask = null;
+  function validHospitalCoordinate(lat,lng){
+    return Number.isFinite(lat) && Number.isFinite(lng)
+      && lat >= -17.35 && lat <= -16.15 && lng >= -49.85 && lng <= -48.75;
+  }
+  function hospitalDecimal(raw){
+    if(raw === null || raw === undefined || String(raw).trim() === '') return null;
+    const value = Number(String(raw).replace(',','.'));
+    return Number.isFinite(value) ? value : null;
+  }
+  function hospitalDistanceKm(a,b){
+    const radians = v => v * Math.PI / 180;
+    const latDifference = radians(b.lat-a.lat);
+    const lngDifference = radians(b.lng-a.lng);
+    const h = Math.sin(latDifference/2)**2
+      + Math.cos(radians(a.lat))*Math.cos(radians(b.lat))*Math.sin(lngDifference/2)**2;
+    return 6371.0088 * 2 * Math.asin(Math.min(1,Math.sqrt(h)));
+  }
+  function hospitalGeoUrl(){
+    const ids = hospitals.map(item => item[4]).filter(id => /^\d{7}$/.test(id));
+    const sql = 'SELECT cnes, latitude, longitude, municipio FROM "'+HOSPITAL_GEO_RESOURCE+'" WHERE cnes IN ('+
+      ids.map(id => "'"+id+"'").join(',')+')';
+    return HOSPITAL_GEO_API+'?sql='+encodeURIComponent(sql);
+  }
+  async function readHospitalGeo(){
+    const ids = hospitals.map(item => item[4]);
+    const mock = window.__rapsHospitalGeoTestCoordinates;
+    let payload;
+    if(mock && typeof mock === 'object'){
+      payload = {result:{records:ids.filter(id=>mock[id]).map(id=>({
+        cnes:id,latitude:mock[id].lat,longitude:mock[id].lng,municipio:'GOIANIA'
+      }))}};
+    } else {
+      const url = hospitalGeoUrl();
+      const controller = new AbortController();
+      const timeout = setTimeout(()=>controller.abort(),8000);
+      try {
+        const res = await fetch(url,{mode:'cors',credentials:'omit',cache:'no-store',referrerPolicy:'no-referrer',signal:controller.signal});
+        if(!res.ok) throw new Error('CNES HTTP '+res.status);
+        payload = await res.json();
+      } catch (_) {
+        payload = await new Promise((resolve,reject)=>{
+          const callbackName = '__rapsHospitalGeo_'+Date.now()+'_'+Math.random().toString(36).slice(2);
+          const script = document.createElement('script');
+          const cleanup=()=>{clearTimeout(limit);script.remove();try{delete window[callbackName]}catch(_){window[callbackName]=undefined}};
+          const limit=setTimeout(()=>{cleanup();reject(new Error('Tempo esgotado ao consultar coordenadas'))},9000);
+          window[callbackName]=data=>{cleanup();resolve(data)};
+          script.onerror=()=>{cleanup();reject(new Error('Consulta CNES indisponível'))};
+          script.referrerPolicy='no-referrer';
+          script.src=url+'&callback='+encodeURIComponent(callbackName);
+          document.head.appendChild(script);
+        });
+      } finally {
+        clearTimeout(timeout);
+      }
+    }
+    const records = payload?.result?.records || [];
+    for(const record of records){
+      const id=String(record?.cnes||'').trim();
+      const lat=hospitalDecimal(record?.latitude),lng=hospitalDecimal(record?.longitude);
+      const municipio=String(record?.municipio||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toUpperCase();
+      if(!ids.includes(id)|| (municipio && !municipio.includes('GOIANIA')) || !validHospitalCoordinate(lat,lng)) continue;
+      hospitalCoordinates.set(id,{lat,lng});
+    }
+    ids.forEach(id=>{if(!hospitalCoordinates.has(id))hospitalCoordinates.set(id,null)});
+  }
+  function rankHospitals(){
+    const container=document.querySelector('.priority-hospital-list');
+    const status=document.getElementById('hospitalLocationStatus');
+    if(!container||!hospitalPosition)return;
+    const cards=[...container.querySelectorAll('article[data-hospital-cnes]')];
+    const ranked=cards.map((card,index)=>{
+      const coordinate=hospitalCoordinates.get(card.dataset.hospitalCnes);
+      const distance=coordinate?hospitalDistanceKm(hospitalPosition,coordinate):null;
+      if(distance!==null){
+        let badge=card.querySelector('[data-hospital-proximity]');
+        if(!badge){
+          badge=document.createElement('p');
+          badge.className='small hospital-distance';
+          badge.dataset.hospitalProximity='1';
+          card.querySelector('h2')?.insertAdjacentElement('afterend',badge);
+        }
+        badge.textContent='≈ '+distance.toFixed(1)+' km em linha reta do local autorizado';
+      }
+      return {card,index,distance};
+    });
+    const complete=ranked.length===hospitals.length && ranked.every(item=>item.distance!==null);
+    if(complete){
+      ranked.sort((a,b)=>a.distance-b.distance||a.index-b.index)
+        .forEach(item=>container.appendChild(item.card));
+      if(status){
+        status.dataset.state='ok';
+        status.textContent='Hospitais ordenados pela distância em linha reta a partir da posição autorizada. A rota real e a facilidade de acesso podem ser diferentes. O atendimento depende do perfil clínico e da regulação.';
+      }
+    } else if(status){
+      status.dataset.state='error';
+      status.textContent='Nem todos os hospitais têm coordenadas públicas válidas disponíveis. Mantive a ordem original para não sugerir uma proximidade não verificada; as rotas por endereço continuam disponíveis.';
+    }
+  }
+  async function refreshHospitalProximity(){
+    const status=document.getElementById('hospitalLocationStatus');
+    if(!hospitalPosition||!status)return;
+    if(!document.getElementById('hospitalGeoTransparency')){
+      const note=document.createElement('p');
+      note.className='small';note.id='hospitalGeoTransparency';
+      note.innerHTML='As coordenadas dos hospitais são consultadas pelos códigos CNES na <a href="'+HOSPITAL_GEO_SOURCE+'" target="_blank" rel="noopener noreferrer">base pública de Goiás ↗</a>. A posição do aparelho não é enviada nessa consulta.';
+      status.insertAdjacentElement('afterend',note);
+    }
+    status.textContent='Localização autorizada. Consultando coordenadas públicas para comparar HUGOL e HUGO…';
+    try {
+      if(!hospitalCoordinatesTask)hospitalCoordinatesTask=readHospitalGeo().finally(()=>{hospitalCoordinatesTask=null});
+      await hospitalCoordinatesTask;
+      rankHospitals();
+    }catch(_){
+      const current=document.getElementById('hospitalLocationStatus');
+      if(current){
+        current.dataset.state='error';
+        current.textContent='Não consegui consultar as coordenadas agora. Não calculei distância nem alterei a ordem; use as rotas por endereço no mapa.';
+      }
+    }
   }
   function priorityLink(route,icon,title,subtitle,kind) {
     return `<a class="nav-card priority-service-choice" href="?p=${route}" data-route="${route}" data-service-kind="${kind}"><span class="icon-square" aria-hidden="true">${icon}</span><span><strong>${title}</strong><p>${subtitle}</p></span><span class="go" aria-hidden="true">›</span></a>`;
@@ -79,11 +206,11 @@
     <section class="panel warning">
       <h2>Importante</h2>
       <p>Hospitais de referência podem atender por regulação. Esta lista não confirma vaga, atendimento imediato ou acesso irrestrito.</p>
-      <p id="hospitalLocationStatus" aria-live="polite">Localização não solicitada; rotas disponíveis por endereço.</p>
+      <p id="hospitalLocationStatus" aria-live="polite">Localização não solicitada. A lista não está ordenada por distância; abra uma rota por endereço ou autorize o GPS para comparar HUGO e HUGOL.</p>
       <button class="btn secondary" id="hospitalUseLocation" type="button">Usar minha localização (opcional)</button>
     </section>
     <section class="priority-hospital-list" aria-label="Hospitais com informações oficiais">
-      ${hospitals.map(([name,description,address,source])=>`<article class="panel">
+      ${hospitals.map(([name,description,address,source,cnes])=>`<article class="panel" data-hospital-cnes="${cnes}">
         <h2>${name}</h2><p>${description}</p><p><strong>Endereço:</strong> ${address}</p>
         <div class="hero-actions">
           <a class="btn" data-hospital-address="${address}" href="${hospitalRoute(address)}" target="_blank" rel="noopener noreferrer">Traçar rota</a>
@@ -100,7 +227,8 @@
   function askHospitalLocation() {
     const status = document.getElementById('hospitalLocationStatus');
     if (hospitalPosition) {
-      if(status) status.textContent = 'Localização ativa nesta sessão para rotas.';
+      if(status) status.textContent = 'Localização ativa nesta sessão; atualizando a comparação de hospitais.';
+      refreshHospitalProximity();
       return;
     }
     if (!navigator.geolocation) {
@@ -111,7 +239,7 @@
     navigator.geolocation.getCurrentPosition(position => {
       hospitalPosition = {lat:position.coords.latitude,lng:position.coords.longitude};
       document.querySelectorAll('[data-hospital-address]').forEach(a=>a.href=hospitalRoute(a.dataset.hospitalAddress));
-      if(status) status.textContent = 'Localização autorizada. O aplicativo usará sua posição como origem ao abrir o mapa externo.';
+      refreshHospitalProximity();
       const button = document.getElementById('hospitalUseLocation');
       if(button) button.textContent = '✓ Localização ativada';
     }, error => {

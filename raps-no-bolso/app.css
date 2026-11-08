@@ -185,3 +185,6 @@ body.high-contrast .priority-service-choice:focus-visible{outline-color:#fff}
   .home-quick-services .priority-service-choice{min-height:82px;padding:14px}
   .home-quick-services .priority-section-title{margin:16px 0 10px}
 }
+
+/* Distância hospitalar verificada com GPS opcional; nunca equivale a tempo de trajeto. */
+.hospital-distance{font-weight:750;color:var(--brand);margin:8px 0 6px}
