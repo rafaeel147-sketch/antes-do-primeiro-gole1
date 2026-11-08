@@ -129,6 +129,56 @@
     '<p class="home-note">Guia educativo gratuito.',
     '<section class="panel soft"><h2>Minha rede de apoio</h2><p>Cadastre até quatro pessoas de confiança ou use o aplicativo sem contatos.</p>'+link('rede-apoio','Gerenciar contatos e avisos','btn secondary')+'</section><p class="home-note">Guia educativo gratuito.'
   );
+  // A seleção original de tipos de atendimento também fica na capa.
+  // Clonamos os mesmos cartões e atributos data-service-kind: navegação, filtro e GPS opcional
+  // continuam usando o fluxo já testado na página "Encontre atendimento".
+  const homeWithSupport = pages.inicio;
+  pages.inicio = () => {
+    const html = homeWithSupport();
+    const home = document.createElement('template');
+    home.innerHTML = html;
+    const root = home.content.querySelector('.page');
+    const generalGrid = root?.querySelector('.home-grid');
+    if (!root || !generalGrid) return html;
+    const selection = document.createElement('template');
+    selection.innerHTML = pages['onde-ajuda']();
+    const serviceGrid = selection.content.querySelector('.priority-service-grid');
+    if (!serviceGrid) return html;
+
+    const intro = root.querySelector('.home-intro');
+    const lead = intro?.querySelector('.lead');
+    if (lead) lead.textContent = 'Escolha diretamente o tipo de atendimento em Goiânia, sem cadastro obrigatório. Se não souber qual serviço usar, consulte as orientações.';
+
+    const quick = document.createElement('section');
+    quick.className = 'home-quick-services';
+    quick.setAttribute('aria-labelledby','homeQuickServicesHeading');
+    quick.innerHTML = '<section class="panel priority-emergency home-quick-emergency">'+
+      '<h2>Emergência ou risco imediato?</h2>'+
+      '<p>Risco à vida, desmaio, convulsão, dificuldade intensa para respirar ou crise psiquiátrica grave: ligue para o SAMU.</p>'+
+      '<a class="btn danger priority-emergency-call" href="tel:192">📞 Ligar para o SAMU 192</a>'+
+      '<p class="small">A ligação não depende de cadastro nem de GPS.</p></section>'+
+      '<h2 class="priority-section-title" id="homeQuickServicesHeading">Qual serviço você procura?</h2>';
+    serviceGrid.classList.add('home-quick-service-grid');
+    quick.appendChild(serviceGrid);
+    const detail = document.createElement('p');
+    detail.className = 'small home-quick-note';
+    detail.textContent = 'Os botões abrem diretamente a busca ou orientação do serviço escolhido. Sua localização é opcional; endereços e busca por texto continuam disponíveis.';
+    quick.appendChild(detail);
+    generalGrid.before(quick);
+
+    // No primeiro acesso, os botões de urgência devem aparecer antes da configuração opcional.
+    const firstPanel = root.querySelector('.support-first-entry');
+    if (firstPanel) quick.after(firstPanel);
+    const generalTitle = document.createElement('h2');
+    generalTitle.className = 'home-secondary-title';
+    generalTitle.textContent = 'Outros caminhos e orientações';
+    generalGrid.before(generalTitle);
+
+    // Evita dois blocos idênticos do SAMU na capa. O atalho 192 acima permanece.
+    root.querySelector('.home-emergency')?.remove();
+    return home.innerHTML;
+  };
+
   const originalRenderNav = renderNav;
   renderNav = function () {
     originalRenderNav();
