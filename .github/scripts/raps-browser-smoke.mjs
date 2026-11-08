@@ -117,6 +117,27 @@ check(await page.locator('.road-group').count() >= 5, 'resultado da rede complet
 await page.selectOption('#roadMode','transit');
 check(await page.locator('#roadResults a[href*="travelmode=transit"]').count() > 0, 'ônibus usa mapa externo e não inventa ranking da linha');
 
+// Sonda não bloqueante: a disponibilidade pública do roteador não é garantida.
+// Verifica CORS real do X-Client-Id a partir do navegador, usando pontos FICTÍCIOS.
+const liveRoadProbe = await page.evaluate(async () => {
+  const controller=new AbortController();
+  const timeout=setTimeout(()=>controller.abort(),7500);
+  try {
+    const data={sources:[{lat:-16.670,lon:-49.290}],
+      targets:[{lat:-16.667,lon:-49.285}],
+      costing:'auto',units:'kilometers'};
+    const url='https://valhalla1.openstreetmap.de/sources_to_targets?json='+encodeURIComponent(JSON.stringify(data));
+    const response=await fetch(url,{mode:'cors',credentials:'omit',cache:'no-store',
+      headers:{'X-Client-Id':'rafaeel147-sketch.github.io/antes-do-primeiro-gole1/raps-no-bolso'},signal:controller.signal});
+    if(!response.ok)return {ok:false,detail:'HTTP '+response.status};
+    const parsed=await response.json();
+    return {ok:typeof parsed?.sources_to_targets?.[0]?.[0]?.distance==='number',detail:'HTTP '+response.status};
+  } catch(error){return {ok:false,detail:String(error?.message||error)}}
+  finally{clearTimeout(timeout)}
+});
+console.log('ROUTING_PROVIDER_LIVE_CORS_PROBE: '+JSON.stringify(liveRoadProbe));
+
+
 await goto('crise');
 check(await page.locator('.priority-crisis-shortcut a[data-route="onde-ajuda"]').count() === 1, 'rota de crise oferece atalho imediato para atendimento');
 check(await page.locator('.priority-crisis-psychiatric a[data-route="urgencia-psiquiatrica"]').count() === 1, 'crise mostra entrada psiquiátrica específica');
