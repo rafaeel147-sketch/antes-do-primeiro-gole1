@@ -205,7 +205,7 @@
   function renderResults(list,mode,criterion,pos){
     const target=value('roadResults');if(!target)return;
     const groups=GROUPS.filter(([id])=>id!=='todos');
-    const selected=value('roadKind')?.value||'upa';
+    const selected=value('roadKind')?.value||'todos';
     const compared=list.filter(x=>x.metrics);
     const unranked=list.length-compared.length;
     const fullyCompared=unranked===0&&compared.length===list.length;
@@ -250,7 +250,7 @@
     if(!consent){status('Autorize explicitamente o envio temporário da posição ao serviço externo de rotas. Sem autorização, use as rotas individuais no mapa.','error');return;}
     if(!navigator.geolocation){status('Seu aparelho não oferece geolocalização. Use as rotas individuais pelo endereço.','error');return;}
     if(lastCalculation&&Date.now()-lastCalculation<12000){status('Para respeitar o serviço comunitário, aguarde entre novas comparações.','error');return;}
-    const kind=value('roadKind')?.value||'upa',mode=value('roadMode')?.value||'auto',criterion=value('roadSort')?.value||'distance';
+    const kind=value('roadKind')?.value||'todos',mode=value('roadMode')?.value||'auto',criterion=value('roadSort')?.value||'distance';
     if(mode==='transit'){status('O cálculo interno por ônibus não está disponível. Abra o transporte público no mapa individual; não inventaremos tempos de linhas.','error');return;}
     lastCalculation=Date.now();
     if(button)button.disabled=true;
@@ -285,7 +285,7 @@
   }
   function unrankedPreview(){
     const el=value('roadResults');if(!el)return;
-    const kind=value('roadKind')?.value||'upa';
+    const kind=value('roadKind')?.value||'todos';
     const mode=value('roadMode')?.value||'auto';
     const all=catalog().filter(s=>kind==='todos'||s.kind===kind);
     const byGroup=GROUPS.filter(([id])=>id!=='todos');
@@ -304,7 +304,7 @@
   pages['rotas-rede'] = () => {
     viewSerial++;
     currentPosition=null;
-    const options=GROUPS.map(([id,text])=>'<option value="'+id+'"'+(id==='upa'?' selected':'')+'>'+esc(text)+'</option>').join('');
+    const options=GROUPS.map(([id,text])=>'<option value="'+id+'"'+(id==='todos'?' selected':'')+'>'+esc(text)+'</option>').join('');
     return '<div class="page road-page">'+
       pageHead('Menor trajeto até atendimento','Compare as rotas pelas ruas em Goiânia; a opção de GPS é voluntária. Primeiro escolha o tipo de serviço.','Piloto experimental')+
       '<section class="panel priority-emergency"><h2>Emergência grave?</h2><p>Não aguarde cálculo de rota nem resultado de mapa. Ligue SAMU 192.</p><a class="btn danger" href="tel:192">Ligar SAMU 192</a></section>'+
@@ -314,7 +314,7 @@
       '<label>Como pretende ir?<select id="roadMode"><option value="auto">Carro (estimativa viária)</option><option value="pedestrian">A pé</option><option value="transit">Ônibus (abrir no mapa)</option></select></label>'+
       '<label>Ordenar por<select id="roadSort"><option value="distance">Menor percurso (km)</option><option value="time">Menor tempo estimado</option></select></label></div>'+
       '<label class="support-check road-consent"><input type="checkbox" id="roadConsent">Autorizo nesta solicitação o compartilhamento temporário da minha posição GPS com o serviço público externo Valhalla/OpenStreetMap para comparar trajetos. Minha posição não será salva no RAPS no Bolso. Ao abrir o mapa externo, seus próprios termos se aplicam.</label>'+
-      '<button type="button" class="btn" id="roadCalculate">Comparar trajetos agora</button>'+
+      '<div class="hero-actions"><button type="button" class="btn" id="roadCalculate">Comparar trajetos agora</button><button type="button" class="btn secondary" id="roadShowWithoutGps">Ver unidades sem GPS</button></div>'+
       '<p class="small">Para ônibus, não calculamos distância/tempo automaticamente: veja itinerários atuais no Google Maps. Os cálculos em carro/a pé usam uma instância comunitária sem garantia de disponibilidade, mapas ou tráfego em tempo real. Apenas Goiânia nesta versão.</p>'+
       '<p id="roadStatus" role="status" aria-live="polite">Nenhuma posição solicitada. Escolha uma categoria e autorize se quiser comparar trajetos.</p>'+
       '<div class="small">Fontes: <a href="'+GEO_SOURCE+'" target="_blank" rel="noopener noreferrer">CNES/Dados Abertos GO ↗</a> · <a href="'+ROUTER_SOURCE+'" target="_blank" rel="noopener noreferrer">Valhalla/OpenStreetMap ↗</a>. Coordenadas de estabelecimentos podem estar desatualizadas; confira endereço e atendimento.</div></section>'+
@@ -339,6 +339,7 @@
   };
   document.addEventListener('click',event=>{
     if(event.target.closest('#roadCalculate'))compareRoutes();
+    if(event.target.closest('#roadShowWithoutGps')){status('Lista por categoria, sem GPS e sem classificação de distância.');unrankedPreview();}
   });
   document.addEventListener('change',event=>{
     if(!event.target.matches('#roadKind,#roadMode,#roadSort'))return;
