@@ -44,6 +44,15 @@ await goto();
 await page.waitForSelector('#speakPage');
 await page.waitForFunction(() => Array.isArray(window.__rapsAddonLoadFailures));
 
+check(await page.locator('.home-quick-service-grid [data-service-kind]').count() === 5, 'capa mostra cinco tipos de atendimento de Goiânia');
+const homeQuickKinds = await page.locator('.home-quick-service-grid [data-service-kind]').evaluateAll(items=>items.map(el=>el.dataset.serviceKind));
+check(JSON.stringify(homeQuickKinds) === JSON.stringify(['psiquiatria','hospital','upa','caps','ubs']), 'capa preserva ordem e categorias da tela Encontrar atendimento');
+check(await page.locator('.home-quick-services a[href="tel:192"]').count() === 1, 'SAMU 192 aparece acima dos serviços na capa');
+check(await page.locator('.home-quick-service-grid [data-service-kind="psiquiatria"]').isVisible(), 'urgência psiquiátrica fica visível na tela inicial');
+check(await page.locator('.home-quick-service-grid [data-service-kind="caps"]').innerText().then(t=>t.includes('Acolhimento')), 'CAPS explica seu tipo de atendimento na capa');
+check(await page.locator('.home-quick-service-grid [data-service-kind="ubs"]').innerText().then(t=>t.includes('Consultas')), 'UBS explica seu tipo de atendimento na capa');
+check(await page.locator('.home-quick-services').evaluate(el=>el.compareDocumentPosition(document.querySelector('.home-grid')) & Node.DOCUMENT_POSITION_FOLLOWING) !== 0, 'acesso rápido aparece antes das orientações gerais');
+check(await page.locator('.home-quick-service-grid a[data-route="onde-ajuda"]').count() === 0, 'cartões da capa levam diretamente ao tipo de serviço');
 check(await page.locator('.home-grid .nav-card').count() === 4, 'início oferece quatro escolhas principais');
 check(await page.locator('.support-first-entry').count() === 1, 'primeira entrada oferece uso sem cadastro');
 check(await page.locator('.support-first-entry a[data-route="onde-ajuda"]').count() === 1, 'primeira entrada mantém atendimento sem cadastro');
@@ -55,6 +64,18 @@ for (const width of [320,390,1024]) {
   check(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), `início não transborda em ${width}px`);
 }
 await page.setViewportSize({width:390,height:844});
+
+await page.locator('.home-quick-service-grid [data-service-kind="upa"]').click();
+await page.waitForSelector('#serviceType');
+check(await page.locator('#serviceType').inputValue() === 'upa', 'UPA da capa abre diretório já filtrado');
+await goto();
+await page.locator('.home-quick-service-grid [data-service-kind="caps"]').click();
+await page.waitForSelector('#serviceType');
+check(await page.locator('#serviceType').inputValue() === 'caps', 'CAPS da capa abre diretório já filtrado');
+await goto();
+await page.locator('.home-quick-service-grid [data-service-kind="psiquiatria"]').click();
+check((await page.locator('h1').first().innerText()).includes('Urgência psiquiátrica'), 'botão psiquiátrico da capa vai para urgência 24h');
+await goto();
 
 await goto('crise');
 check(await page.locator('.priority-crisis-shortcut a[data-route="onde-ajuda"]').count() === 1, 'rota de crise oferece atalho imediato para atendimento');

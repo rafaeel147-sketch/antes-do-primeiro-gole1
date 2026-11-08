@@ -169,3 +169,19 @@ body.high-contrast .priority-service-choice:focus-visible{outline-color:#fff}
   .support-contact,.support-form-bottom{grid-column:1}
   .support-active-flow .hero-actions,.support-first-entry .hero-actions{display:grid;grid-template-columns:1fr}
 }
+
+/* Acesso rápido por tipo de serviço diretamente na capa; reutiliza os cartões de "Encontre atendimento". */
+.home-quick-services{margin:16px 0 22px}
+.home-quick-services .priority-emergency{margin-bottom:18px}
+.home-quick-services .priority-section-title{margin:18px 0 12px}
+.home-quick-service-grid{margin-bottom:10px}
+.home-quick-service-grid .priority-service-choice{min-height:88px}
+.home-quick-note{color:var(--muted);margin:4px 0 14px;max-width:800px}
+.home-secondary-title{font-size:clamp(1.15rem,2.5vw,1.45rem);margin:22px 0 12px}
+.home-quick-services+.support-first-entry{margin:16px 0}
+@media(max-width:640px){
+  .home-quick-services{margin:8px 0 18px}
+  .home-quick-services .priority-emergency{padding:14px}
+  .home-quick-services .priority-service-choice{min-height:82px;padding:14px}
+  .home-quick-services .priority-section-title{margin:16px 0 10px}
+}
