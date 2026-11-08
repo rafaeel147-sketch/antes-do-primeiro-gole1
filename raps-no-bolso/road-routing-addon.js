@@ -168,7 +168,7 @@
     return ROUTER+'?json='+encodeURIComponent(JSON.stringify(req));
   }
   function wait(ms){return new Promise(resolve=>setTimeout(resolve,ms))}
-  async function matrixRows(source,items,mode){
+  async function matrixRows(source,items,mode,isStillActive){
     const injected=window.__rapsRoadTestMatrix;
     if(injected&&typeof injected==='object'){
       return items.map(s=>{
@@ -181,6 +181,8 @@
     // Apenas lotes pequenos e iniciados pelo usuário: servidor comunitário não é infraestrutura de emergência.
     for(let offset=0;offset<items.length;offset+=20){
       if(offset)await wait(1250);
+      // Não enviar novas posições se a pessoa saiu da tela ou deixou o app em segundo plano.
+      if(isStillActive && !isStillActive())break;
       const slice=items.slice(offset,offset+20);
       try {
         const response=await fetchJson(matrixUrl(source,slice,mode),13000,{'X-Client-Id':ID_HEADER});
@@ -272,7 +274,7 @@
       const eligible=selected.filter(x=>x.cnes&&coordCache.get(x.cnes));
       const matrixItems=eligible.map(x=>({...x,geo:coordCache.get(x.cnes)}));
       status('Calculando percursos reais para '+matrixItems.length+' unidade(s) com coordenadas disponíveis. Os resultados podem ser parciais.');
-      const rows=matrixItems.length?await matrixRows(pos,matrixItems,mode):[];
+      const rows=matrixItems.length?await matrixRows(pos,matrixItems,mode,()=>serial===viewSerial && Boolean(value('roadResults')) && !document.hidden):[];
       if(serial!==viewSerial||!value('roadResults'))return;
       const byKey=new Map(matrixItems.map((s,i)=>[s.cnes+'|'+s.name,rows[i]]));
       const full=selected.map(x=>({...x,metrics:byKey.get(x.cnes+'|'+x.name)||null}));
