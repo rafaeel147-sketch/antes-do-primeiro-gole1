@@ -103,11 +103,39 @@ await page.locator('[data-service-kind="caps"]').click();
 await page.waitForSelector('#serviceResults');
 check(await page.locator('#serviceType').inputValue() === 'caps', 'escolher CAPS mostra a família de serviços CAPS');
 check(await page.locator('#serviceResults .service-card').count() > 0, 'filtro CAPS retorna serviços');
+// A lista sem GPS não afirma qual hospital está mais próximo.
+await goto('hospitais-urgencia');
+check((await page.locator('#hospitalLocationStatus').innerText()).includes('não está ordenada por distância'), 'sem GPS hospital não inventa ranking por proximidade');
+check((await page.locator('.priority-hospital-list article').count()) === 2, 'HUGO e HUGOL estão na lista mesmo sem GPS');
 await goto('onde-ajuda');
+await context.setGeolocation({latitude:-16.649,longitude:-49.338});
+await page.evaluate(() => {
+  window.__rapsHospitalGeoTestCoordinates = {
+    '7743068':{lat:-16.648,lng:-49.337},
+    '2338262':{lat:-16.700,lng:-49.270}
+  };
+});
 await page.locator('[data-service-kind="hospital"]').click();
 check((await page.locator('h1').first().innerText()).includes('Hospital'), 'escolher hospital abre informações hospitalares');
 check(await page.locator('.priority-hospital-list article').count() === 2, 'hospitais exibem duas referências com fontes oficiais');
-check(!(await page.locator('#hospitalLocationStatus').innerText()).includes('não solicitada'), 'escolher hospital inicia GPS opcional com rotas por endereço');
+await page.waitForFunction(() => document.getElementById('hospitalLocationStatus')?.dataset.state === 'ok');
+check(await page.locator('.priority-hospital-list article').first().getAttribute('data-hospital-cnes') === '7743068', 'GPS fictício próximo ao HUGOL coloca HUGOL primeiro');
+check((await page.locator('#hospitalLocationStatus').innerText()).includes('linha reta'), 'distância hospitalar é identificada como linha reta e não percurso');
+check(await page.locator('.hospital-distance').count() === 2, 'distâncias aparecem só para hospitais com coordenadas validadas');
+check((await page.locator('.priority-hospital-list article').first().innerText()).includes('regulação'), 'cartão HUGOL avisa que acesso pode depender de regulação');
+check((await page.locator('[data-hospital-address]').first().getAttribute('href')).includes('origin='), 'rota hospitalar passa GPS autorizado como origem apenas ao abrir Maps');
+await goto('onde-ajuda');
+await context.setGeolocation({latitude:-16.700,longitude:-49.269});
+await page.evaluate(() => {
+  window.__rapsHospitalGeoTestCoordinates = {
+    '7743068':{lat:-16.648,lng:-49.337},
+    '2338262':{lat:-16.700,lng:-49.270}
+  };
+});
+await page.locator('[data-service-kind="hospital"]').click();
+await page.waitForFunction(() => document.getElementById('hospitalLocationStatus')?.dataset.state === 'ok');
+check(await page.locator('.priority-hospital-list article').first().getAttribute('data-hospital-cnes') === '2338262', 'GPS fictício próximo ao HUGO coloca HUGO primeiro sem viés fixo');
+await context.setGeolocation({latitude:-16.6869,longitude:-49.2648});
 await goto();
 
 check(await page.locator('#fontDown').isVisible(), 'A− está visível no viewport mobile');
