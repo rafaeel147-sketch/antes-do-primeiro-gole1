@@ -278,10 +278,16 @@
       const full=selected.map(x=>({...x,metrics:byKey.get(x.cnes+'|'+x.name)||null}));
       renderResults(full,mode,criterion,pos);
     }catch(error){
-      status('Não foi possível calcular a rota agora: '+String(error?.message||error)+'. Você ainda pode abrir os destinos no mapa.','error');
+      const failure='Não foi possível calcular a rota agora: '+String(error?.message||error)+'.';
       const chosen=catalog().filter(x=>kind==='todos'||x.kind===kind);
       renderResults(chosen.map(s=>({...s,metrics:null})),mode,criterion,currentPosition);
-    }finally{if(button)button.disabled=false;}
+      status(failure+' Nenhuma posição foi salva; os destinos permanecem disponíveis para abrir no mapa.','error');
+    }finally{
+      if(button)button.disabled=false;
+      // Cada nova comparação exige uma nova autorização; o GPS não fica retido em memória.
+      if(value('roadConsent'))value('roadConsent').checked=false;
+      currentPosition=null;
+    }
   }
   function unrankedPreview(){
     const el=value('roadResults');if(!el)return;
