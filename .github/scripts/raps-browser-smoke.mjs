@@ -137,6 +137,18 @@ const liveRoadProbe = await page.evaluate(async () => {
 });
 console.log('ROUTING_PROVIDER_LIVE_CORS_PROBE: '+JSON.stringify(liveRoadProbe));
 
+// Privacidade: chamadas a motores de rota externos incluem coordenadas e não podem ser salvas no CacheStorage.
+const cachedExternalRequests = await page.evaluate(async () => {
+  const urls=[];
+  for(const key of await caches.keys()){
+    const cache=await caches.open(key);
+    for(const req of await cache.keys()) urls.push(req.url);
+  }
+  return urls.filter(url=>url.includes('valhalla1.openstreetmap.de')||url.includes('dadosabertos.go.gov.br'));
+});
+check(cachedExternalRequests.length===0, 'service worker não armazena URLs externas com localização GPS');
+
+
 
 await goto('crise');
 check(await page.locator('.priority-crisis-shortcut a[data-route="onde-ajuda"]').count() === 1, 'rota de crise oferece atalho imediato para atendimento');
