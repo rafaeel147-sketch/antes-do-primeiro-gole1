@@ -77,6 +77,79 @@ await page.locator('.home-quick-service-grid [data-service-kind="psiquiatria"]')
 check((await page.locator('h1').first().innerText()).includes('Urgência psiquiátrica'), 'botão psiquiátrico da capa vai para urgência 24h');
 await goto();
 
+await goto();
+check(await page.locator('.road-home-shortcut a[data-route="rotas-rede"]').count() === 1, 'capa oferece comparação por trajetos de toda a rede');
+await goto('rotas-rede');
+check((await page.locator('h1').first().innerText()).includes('Menor trajeto'), 'comparador de rotas tem página específica');
+check(await page.locator('#roadKind option').count() === 7, 'comparador oferece todas as categorias e a rede completa');
+const allRoadServices = await page.evaluate(() => window.RAPSRoadRoutingTest.catalog());
+check(allRoadServices.length > 100, 'comparador lê todos os registros cadastrados, incluindo dezenas de UBS');
+check(allRoadServices.some(x=>x.name.includes('HUGOL')), 'HUGOL está no catálogo geral de rotas');
+check(allRoadServices.filter(x=>x.kind==='ubs').length >= 80, 'comparador inclui todos os registros de atenção básica da versão oficial');
+check(await page.locator('#roadConsent').isChecked() === false, 'localização e compartilhamento começam desautorizados');
+await page.locator('#roadCalculate').click();
+check((await page.locator('#roadStatus').innerText()).includes('Autorize explicitamente'), 'sem consentimento não inicia GPS nem consulta externa');
+// Teste determinístico: HUGO mais perto em linha reta, HUGOL menor percurso simulado.
+await page.evaluate(() => {
+  const records=window.RAPSRoadRoutingTest.catalog();
+  window.__rapsRoadTestCoordinates={};
+  window.__rapsRoadTestMatrix={};
+  records.forEach((x,i)=>{
+    if(!x.cnes)return;
+    window.__rapsRoadTestCoordinates[x.cnes]={lat:-16.68-i*0.0001,lon:-49.27};
+    window.__rapsRoadTestMatrix[x.cnes]={distance:5+i/10,time:400+i*10};
+  });
+  window.__rapsRoadTestCoordinates['7743068']={lat:-16.61,lon:-49.39};
+  window.__rapsRoadTestCoordinates['2338262']={lat:-16.687,lon:-49.265};
+  window.__rapsRoadTestMatrix['7743068']={distance:2.2,time:280};
+  window.__rapsRoadTestMatrix['2338262']={distance:8.4,time:650};
+});
+await page.selectOption('#roadKind','todos');
+await page.check('#roadConsent');
+await page.locator('#roadCalculate').click();
+await page.waitForFunction(() => document.querySelector('#roadResults .road-card') !== null);
+const roadResultCount=await page.locator('#roadResults .road-card').count();
+check(roadResultCount===allRoadServices.length, 'comparador apresenta todos os registros da rede, mesmo os sem rota verificada');
+check((await page.locator('#roadResults .road-group').first().locator('.road-card').first().innerText()).includes('HUGOL'), 'menor percurso de vias prioriza HUGOL mesmo quando HUGO é mais perto em linha reta');
+check((await page.locator('#roadStatus').innerText()).includes('registros com trajeto calculado'), 'cobertura de rotas é explicitada');
+check((await page.locator('.road-metric').first().innerText()).includes('km pelas vias'), 'resultado diferencia trajeto por vias e linha reta');
+check(await page.locator('.road-group').count() >= 5, 'resultado da rede completa é agrupado por tipo de cuidado');
+await page.selectOption('#roadMode','transit');
+check(await page.locator('#roadResults a[href*="travelmode=transit"]').count() > 0, 'ônibus usa mapa externo e não inventa ranking da linha');
+
+// Sonda não bloqueante: a disponibilidade pública do roteador não é garantida.
+// Verifica CORS real do X-Client-Id a partir do navegador, usando pontos FICTÍCIOS.
+const liveRoadProbe = await page.evaluate(async () => {
+  const controller=new AbortController();
+  const timeout=setTimeout(()=>controller.abort(),7500);
+  try {
+    const data={sources:[{lat:-16.670,lon:-49.290}],
+      targets:[{lat:-16.667,lon:-49.285}],
+      costing:'auto',units:'kilometers'};
+    const url='https://valhalla1.openstreetmap.de/sources_to_targets?json='+encodeURIComponent(JSON.stringify(data));
+    const response=await fetch(url,{mode:'cors',credentials:'omit',cache:'no-store',
+      headers:{'X-Client-Id':'rafaeel147-sketch.github.io/antes-do-primeiro-gole1/raps-no-bolso'},signal:controller.signal});
+    if(!response.ok)return {ok:false,detail:'HTTP '+response.status};
+    const parsed=await response.json();
+    return {ok:typeof parsed?.sources_to_targets?.[0]?.[0]?.distance==='number',detail:'HTTP '+response.status};
+  } catch(error){return {ok:false,detail:String(error?.message||error)}}
+  finally{clearTimeout(timeout)}
+});
+console.log('ROUTING_PROVIDER_LIVE_CORS_PROBE: '+JSON.stringify(liveRoadProbe));
+
+// Privacidade: chamadas a motores de rota externos incluem coordenadas e não podem ser salvas no CacheStorage.
+const cachedExternalRequests = await page.evaluate(async () => {
+  const urls=[];
+  for(const key of await caches.keys()){
+    const cache=await caches.open(key);
+    for(const req of await cache.keys()) urls.push(req.url);
+  }
+  return urls.filter(url=>url.includes('valhalla1.openstreetmap.de')||url.includes('dadosabertos.go.gov.br'));
+});
+check(cachedExternalRequests.length===0, 'service worker não armazena URLs externas com localização GPS');
+
+
+
 await goto('crise');
 check(await page.locator('.priority-crisis-shortcut a[data-route="onde-ajuda"]').count() === 1, 'rota de crise oferece atalho imediato para atendimento');
 check(await page.locator('.priority-crisis-psychiatric a[data-route="urgencia-psiquiatrica"]').count() === 1, 'crise mostra entrada psiquiátrica específica');
