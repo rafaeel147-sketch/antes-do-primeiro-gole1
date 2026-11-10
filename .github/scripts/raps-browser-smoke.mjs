@@ -53,7 +53,7 @@ check((await page.locator('h1').first().innerText()).includes('Distrito Federal'
 check(await page.locator('.df-pilot-page .df-service-card').count() === 4, 'DF lista UBS, CAPS, UPAs e hospitais com fontes oficiais');
 check(await page.locator('.df-hospital-list .df-hospital-card').count() === 2, 'DF exibe apenas duas referências documentadas de saúde mental');
 check(await page.locator('.df-pilot-page a[href="tel:192"]').count() === 1, 'DF preserva SAMU 192 em destaque');
-check(await page.locator('.df-pilot-page').innerText().then(s=>s.includes('não calculamos') || s.includes('Não calculamos')), 'DF não inventa menor rota nem hora de chegada');
+check(await page.locator('.df-pilot-page').innerText().then(s=>s.includes('comparação de percurso ainda parcial')), 'DF avisa que classificação viária da UPA é parcial');
 check(await page.locator('.df-pilot-page').innerText().then(s=>s.includes('GeoJSON') || s.includes('coordenadas')), 'DF sinaliza pendência de importação das coordenadas');
 check(await page.locator('.df-pilot-page #roadConsent').count() === 0, 'DF não reutiliza consentimento de roteamento de Goiânia');
 check(await page.locator('.df-pilot-page [data-hospital-proximity]').count() === 0, 'DF não herda ranking HUGOL/HUGO');
@@ -68,6 +68,44 @@ for(const width of [320,390,1024]){
   check(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth), 'página DF não transborda em '+width+'px');
 }
 await page.setViewportSize({width:390,height:844});
+// Falha relatada no Android: botão de UPA abria buscador externo que exigia CEP.
+// Agora a opção deve ficar no RAPS no Bolso, listar 13 UPAs e solicitar GPS depois do toque.
+await goto('df-servicos');
+check(await page.locator('.df-service-card a[data-route="df-upas"]').count() === 1, 'DF abre UPAs em rota interna, não no formulário de CEP');
+check((await page.locator('.df-service-card a[data-route="df-upas"]').innerText()).includes('sem CEP'), 'botão UPA deixa claro acesso sem CEP');
+check((await page.locator('.df-service-card').filter({hasText:'UPA 24 horas'}).innerText()).includes('Valhalla'), 'tela informa compartilhamento externo da localização antes do toque');
+await context.setGeolocation({latitude:-15.8758,longitude:-47.9821});
+await page.evaluate(()=>{
+  window.__rapsDFUpaTestMatrix={
+    sobradinho:{distance:37,time:2900},
+    'sao-sebastiao':{distance:21,time:1300},
+    samambaia:{distance:24,time:1600},
+    recanto:{distance:13,time:800},
+    bandeirante:{distance:2.5,time:320},
+    ceilandia:{distance:28,time:1750}
+  };
+});
+await page.locator('.df-service-card a[data-route="df-upas"]').click();
+check((await page.locator('h1').first().innerText()).includes('UPAs 24 horas'), 'opção UPA abre busca interna no DF');
+check(await page.locator('input[placeholder*="CEP"]').count() === 0, 'rota de UPAs do DF não exige campo CEP');
+check(await page.locator('.df-upa-card').count() === 13, 'todos os 13 endereços de UPA publicados pelo IGESDF aparecem');
+check((await page.locator('#dfUpaStatus').innerText()).includes('Solicitando') ||
+  (await page.locator('#dfUpaStatus').innerText()).includes('Matriz viária'), 'toque em UPA inicia tentativa de localização do aparelho');
+await page.waitForFunction(()=>document.getElementById('dfUpaStatus')?.textContent?.includes('6 de 13'));
+check((await page.locator('.df-upa-results .panel.soft').innerText()).includes('PARCIAL'), 'ranking nunca afirma que as 13 UPAs foram comparadas');
+check(await page.locator('.df-upa-card').first().getAttribute('data-df-upa')==='bandeirante', 'matriz viária escolhe menor percurso entre seis unidades calculadas');
+check((await page.locator('.df-upa-card').first().innerText()).includes('2.5 km pelas vias'), 'menor trajeto exibe quilômetros pelas ruas');
+check(await page.locator('.df-upa-card .road-unranked').count()===7, 'sete UPAs sem coordenadas permanecem listadas sem ordem falsa');
+check(await page.locator('.df-upa-card a[href*="google.com/maps/dir"]').count()===26, 'todas as UPAs oferecem caminhos no mapa, inclusive ônibus');
+check((await page.locator('.df-upa-card').first().locator('a').first().getAttribute('href')).includes('origin='), 'rota usa posição autorizada como origem somente ao abrir o mapa');
+await goto('df-upas');
+check(await page.locator('.df-upa-card').count()===13, 'acesso direto sem clique mostra 13 UPAs mesmo sem GPS');
+check((await page.locator('#dfUpaStatus').innerText()).includes('Nenhuma localização solicitada'), 'abrir link direto não dispara GPS automaticamente');
+check(!(await page.locator('.df-upa-card').first().locator('a').first().getAttribute('href')).includes('origin='), 'sem permissão rota por endereço não expõe origem');
+check(await page.locator('input').filter({hasText:'CEP'}).count()===0, 'não existe entrada obrigatória de CEP no diretório UPA');
+await context.setGeolocation({latitude:-16.6869,longitude:-49.2648});
+await goto();
+
 await goto('selecionar-regiao');
 check(await page.locator('.df-region-choice a[data-route="inicio"]').count() === 1, 'seletor mantém link de volta para Goiânia');
 check(await page.locator('.df-region-choice a[data-route="df-servicos"]').count() === 1, 'seletor permite abrir prévia DF');
