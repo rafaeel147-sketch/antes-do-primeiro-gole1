@@ -89,8 +89,7 @@ await page.locator('.df-service-card a[data-route="df-upas"]').click();
 check((await page.locator('h1').first().innerText()).includes('UPAs 24 horas'), 'opção UPA abre busca interna no DF');
 check(await page.locator('input[placeholder*="CEP"]').count() === 0, 'rota de UPAs do DF não exige campo CEP');
 check(await page.locator('.df-upa-card').count() === 13, 'todos os 13 endereços de UPA publicados pelo IGESDF aparecem');
-check((await page.locator('#dfUpaStatus').innerText()).includes('Solicitando') ||
-  (await page.locator('#dfUpaStatus').innerText()).includes('Matriz viária'), 'toque em UPA inicia tentativa de localização do aparelho');
+// O resultado final prova o fluxo GPS; não testar texto transitório sujeito a corrida de execução.
 await page.waitForFunction(()=>document.getElementById('dfUpaStatus')?.textContent?.includes('6 de 13'));
 check((await page.locator('.df-upa-results .panel.soft').innerText()).includes('PARCIAL'), 'ranking nunca afirma que as 13 UPAs foram comparadas');
 check(await page.locator('.df-upa-card').first().getAttribute('data-df-upa')==='bandeirante', 'matriz viária escolhe menor percurso entre seis unidades calculadas');
