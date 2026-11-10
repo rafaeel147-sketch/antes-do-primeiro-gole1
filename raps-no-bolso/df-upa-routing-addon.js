@@ -180,7 +180,7 @@
           '<a class="btn secondary" target="_blank" rel="noopener noreferrer" href="'+IGES+'">Consultar fonte oficial ↗</a>';
       }
       const desc=card.querySelector('p');
-      if(desc)desc.textContent='Veja as 13 UPAs 24h do DF aqui no aplicativo. Ao escolher, o GPS será solicitado para comparar percursos; sem GPS, a lista continua disponível.';
+      if(desc)desc.textContent='Veja as 13 UPAs aqui, sem CEP. Ao tocar, o navegador pedirá GPS; se autorizado, enviará sua posição temporariamente ao Valhalla/OpenStreetMap para calcular as rotas. Sem GPS, a lista permanece disponível.';
     }
     const warning=[...template.content.querySelectorAll('.panel.warning p')].find(x=>x.textContent.includes('Não calculamos'));
     if(warning)warning.textContent='A busca de UPA funciona aqui sem CEP, com comparação de percurso ainda parcial. O catálogo geográfico de CAPS, UBS e outros serviços ainda está em validação; para eles, consulte as fontes oficiais.';
