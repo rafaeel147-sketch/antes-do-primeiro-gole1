@@ -30,3 +30,16 @@
 - A prévia DF exige validação do smoke no GitHub Actions antes de qualquer merge. O branch não é prova de publicação.
 - Não afirmar que o serviço mais próximo é o mais indicado ou que haverá atendimento sem regulação.
 - Não afirmar que o catálogo DF está completo ou que a matriz viária DF já calcula trajetos.
+
+
+## Revisão 10/11/2026 — corrigir formulário de CEP da busca de UPA
+- Evidência fornecida pelo usuário: captura do navegador Android aberta pelo botão UPA, exibindo campo obrigatório "Digite o CEP ou Endereço", sem acesso rápido por localização.
+- Correção: rota interna \`?p=df-upas\` com lista **13 UPAs do IGESDF** por nome e endereço, sem CEP, CPF ou cadastro. A rota é exibida mesmo sem GPS.
+- Ao tocar no cartão de UPA da página DF, o app navega para \`df-upas\` e tenta GPS do aparelho **apenas após essa escolha**, via autorização do navegador. O cartão informa previamente envio temporário ao Valhalla/OpenStreetMap para obter trajetos. A página contém botão para repetir a tentativa.
+- A matriz viária usa 6 coordenadas públicas do GeoNode IPEDF (\`saude_sala_situacao_2\`, camada publicada em **2023**) para São Sebastião, Sobradinho, Núcleo Bandeirante, Samambaia, Recanto das Emas e Ceilândia. **NÃO** afirmar que representam o conjunto das 13 UPAs nem que continuam exatas para a entrada da unidade em 2026.
+- Resultados parciais sempre mostram \`comparação PARCIAL: N de 13\`; as sete unidades ainda sem coordenada validada ficam visíveis e podem abrir rotas por endereço. Nenhuma é classificada como mais próxima sem cálculo.
+- Rotas internas pela rede viária: \`Valhalla /sources_to_targets\` comunitário para carro/pedestre, sem disponibilidade garantida, trânsito atualizado ou dados de vaga. Ônibus abre Google Maps sem ranking interno. GPS permanece na sessão de cálculo e não é salvo localmente. Ao abrir mapa externo, o provedor recebe os dados da rota.
+- Se GPS for negado, coordenada inválida ou roteador não responder, a lista das treze UPAs e seus links externos continuam utilizáveis sem CEP.
+- Endereços e horários: https://igesdf.org.br/unidades/ (portal oficial do gestor, conferido em nov/2026). Camada e data: https://catalogo.ipe.df.gov.br/layers/geonode_data:geonode:saude_sala_situacao_2 (2023). Fontes de serviços: https://info.saude.df.gov.br/u/.
+- Testes Playwright: abrir UPA sem redirecionar, nenhuma entrada CEP, 13 unidades mesmo sem GPS, 6 dados geográficos históricos, ranking simulado por percurso viário e não proximidade reta, estado parcial, botão rota para todas, modo mobile e isolamento de Goiânia.
+- **PENDENTE**: camada GeoJSON SES-DF atualizada e geocódigo auditado das 13; verificação de entrada real e trajeto em Android físico; qualidade e condições de uso do roteador em produção. Nunca apresentar "mais próxima de todas" enquanto estes itens não forem resolvidos.
