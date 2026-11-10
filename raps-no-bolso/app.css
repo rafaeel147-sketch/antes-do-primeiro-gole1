@@ -255,3 +255,25 @@ body.high-contrast .priority-service-choice:focus-visible{outline-color:#fff}
   .df-upa-results{grid-template-columns:1fr}
   .df-upa-card .hero-actions{grid-template-columns:1fr}
 }
+
+/* CAPS DF: agrupamento por público, sem mistura de CAPS adulto / AD / infantojuvenil. */
+.df-caps-control{margin:16px 0 22px;border:2px solid var(--brand-2)}
+.df-caps-control h2{margin-top:0}
+.df-caps-control #dfCapsLocate{min-height:52px;width:100%;font-weight:800}
+.df-caps-control #dfCapsLocate:disabled{opacity:.7}
+#dfCapsStatus{margin:14px 0;padding:12px;background:var(--surface-soft);border-left:4px solid var(--brand-2)}
+#dfCapsStatus[data-state="error"]{border-left-color:var(--danger)}
+.df-caps-results{display:grid;gap:14px}
+.df-caps-coverage p{margin:4px 0 8px}
+.df-caps-group{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin:10px 0 22px}
+.df-caps-group>h2,.df-caps-group>p{grid-column:1/-1;margin:0}
+.df-caps-card{min-width:0}
+.df-caps-card h3{margin:0 0 8px}
+.df-caps-card p{overflow-wrap:anywhere}
+.df-caps-card .road-best{display:block;margin:8px 0;color:var(--ok)}
+.df-caps-card .hero-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.df-caps-card .btn{text-align:center;min-width:0;min-height:46px}
+@media(max-width:720px){
+  .df-caps-group{grid-template-columns:1fr}
+  .df-caps-card .hero-actions{grid-template-columns:1fr}
+}
