@@ -44,6 +44,37 @@ await goto();
 await page.waitForSelector('#speakPage');
 await page.waitForFunction(() => Array.isArray(window.__rapsAddonLoadFailures));
 
+// Prévia DF: região explícita, sem GPS automático, sem ranking inventado.
+check(await page.locator('.df-region-entry a[data-route="df-servicos"]').count() === 1, 'capa inclui entrada explícita do Distrito Federal');
+check(await page.locator('.df-region-entry').innerText().then(s=>s.includes('Goiânia')), 'capa preserva Goiânia como piloto principal');
+check(await page.locator('a[href="tel:192"]').count() > 0, 'capa continua com SAMU 192');
+await page.locator('.df-region-entry a[data-route="df-servicos"]').click();
+check((await page.locator('h1').first().innerText()).includes('Distrito Federal'), 'entrada DF abre diretório separado');
+check(await page.locator('.df-pilot-page .df-service-card').count() === 4, 'DF lista UBS, CAPS, UPAs e hospitais com fontes oficiais');
+check(await page.locator('.df-hospital-list .df-hospital-card').count() === 2, 'DF exibe apenas duas referências documentadas de saúde mental');
+check(await page.locator('.df-pilot-page a[href="tel:192"]').count() === 1, 'DF preserva SAMU 192 em destaque');
+check(await page.locator('.df-pilot-page').innerText().then(s=>s.includes('não calculamos') || s.includes('Não calculamos')), 'DF não inventa menor rota nem hora de chegada');
+check(await page.locator('.df-pilot-page').innerText().then(s=>s.includes('GeoJSON') || s.includes('coordenadas')), 'DF sinaliza pendência de importação das coordenadas');
+check(await page.locator('.df-pilot-page #roadConsent').count() === 0, 'DF não reutiliza consentimento de roteamento de Goiânia');
+check(await page.locator('.df-pilot-page [data-hospital-proximity]').count() === 0, 'DF não herda ranking HUGOL/HUGO');
+check(await page.locator('.df-pilot-page a[href*="info.saude.df.gov.br"]').count() >= 4, 'DF aponta para buscadores oficiais');
+check(await page.locator('.df-hospital-list a[href*="google.com/maps/dir"]').count() === 6, 'DF oferece rotas por endereço para ambos os hospitais documentados');
+const dfMaps=await page.locator('.df-hospital-list a[href*="google.com/maps/dir"]').evaluateAll(links=>links.map(x=>x.href));
+check(dfMaps.every(u=>!new URL(u).searchParams.has('origin')), 'links de mapas DF não inferem GPS nem compartilham origem');
+const dfRefs=await page.evaluate(()=>window.RAPSDFPilotTest?.references());
+check(dfRefs?.length===2 && dfRefs[0].name.includes('São Vicente') && dfRefs[1].name.includes('Base'), 'catálogo DF conserva somente referências verificadas');
+for(const width of [320,390,1024]){
+  await page.setViewportSize({width,height:844});
+  check(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth), 'página DF não transborda em '+width+'px');
+}
+await page.setViewportSize({width:390,height:844});
+await goto('selecionar-regiao');
+check(await page.locator('.df-region-choice a[data-route="inicio"]').count() === 1, 'seletor mantém link de volta para Goiânia');
+check(await page.locator('.df-region-choice a[data-route="df-servicos"]').count() === 1, 'seletor permite abrir prévia DF');
+await goto('rotas-rede');
+check((await page.locator('h1').first().innerText()).includes('Menor trajeto'), 'comparador viário Goiânia continua isolado');
+await goto();
+
 check(await page.locator('.home-quick-service-grid [data-service-kind]').count() === 5, 'capa mostra cinco tipos de atendimento de Goiânia');
 const homeQuickKinds = await page.locator('.home-quick-service-grid [data-service-kind]').evaluateAll(items=>items.map(el=>el.dataset.serviceKind));
 check(JSON.stringify(homeQuickKinds) === JSON.stringify(['psiquiatria','hospital','upa','caps','ubs']), 'capa preserva ordem e categorias da tela Encontrar atendimento');
