@@ -53,7 +53,7 @@ check((await page.locator('h1').first().innerText()).includes('Distrito Federal'
 check(await page.locator('.df-pilot-page .df-service-card').count() === 4, 'DF lista UBS, CAPS, UPAs e hospitais com fontes oficiais');
 check(await page.locator('.df-hospital-list .df-hospital-card').count() === 2, 'DF exibe apenas duas referências documentadas de saúde mental');
 check(await page.locator('.df-pilot-page a[href="tel:192"]').count() === 1, 'DF preserva SAMU 192 em destaque');
-check(await page.locator('.df-pilot-page').innerText().then(s=>s.includes('comparação de percurso ainda parcial')), 'DF avisa que classificação viária da UPA é parcial');
+check(await page.locator('.df-pilot-page').innerText().then(s=>s.includes('UPAs e CAPS') && s.includes('PARCIAL')), 'DF avisa que os rankings de UPAs e CAPS são parciais');
 check(await page.locator('.df-pilot-page').innerText().then(s=>s.includes('GeoJSON') || s.includes('coordenadas')), 'DF sinaliza pendência de importação das coordenadas');
 check(await page.locator('.df-pilot-page #roadConsent').count() === 0, 'DF não reutiliza consentimento de roteamento de Goiânia');
 check(await page.locator('.df-pilot-page [data-hospital-proximity]').count() === 0, 'DF não herda ranking HUGOL/HUGO');
@@ -102,6 +102,56 @@ check(await page.locator('.df-upa-card').count()===13, 'acesso direto sem clique
 check((await page.locator('#dfUpaStatus').innerText()).includes('Nenhuma localização solicitada'), 'abrir link direto não dispara GPS automaticamente');
 check(!(await page.locator('.df-upa-card').first().locator('a').first().getAttribute('href')).includes('origin='), 'sem permissão rota por endereço não expõe origem');
 check(await page.locator('input').filter({hasText:'CEP'}).count()===0, 'não existe entrada obrigatória de CEP no diretório UPA');
+await context.setGeolocation({latitude:-16.6869,longitude:-49.2648});
+await goto();
+
+// Regressão DF CAPS: clique abre lista interna (sem CEP) e GPS opcional compara
+// apenas serviços da mesma modalidade, sem ordenar CAPS adulto junto de CAPSi/AD.
+await goto('df-servicos');
+check(await page.locator('.df-service-card a[data-route="df-caps"]').count()===1,'CAPS no DF tem acesso interno sem formulário de CEP');
+check((await page.locator('.df-service-card a[data-route="df-caps"]').innerText()).includes('sem CEP'), 'botão CAPS identifica busca sem CEP');
+check((await page.locator('.df-service-card').filter({hasText:'CAPS e CAPS AD'}).innerText()).includes('roteador externo'), 'CAPS avisa compartilhamento temporário externo de GPS antes do clique');
+await context.setGeolocation({latitude:-15.81,longitude:-47.89});
+await page.evaluate(()=>{
+  const records=window.RAPSDFCapsTest.all();
+  window.__rapsDFCapsTestMatrix={};
+  records.filter(x=>x.hasGeo).forEach((x,i)=>{
+    window.__rapsDFCapsTestMatrix[x.key]={distance:10+i/3,time:650+i*25};
+  });
+  window.__rapsDFCapsTestMatrix['capsi-asa-norte']={distance:0.9,time:110};
+  window.__rapsDFCapsTestMatrix['caps-paranoa']={distance:1.8,time:310};
+  window.__rapsDFCapsTestMatrix['capsad-guara']={distance:1.7,time:200};
+});
+await page.locator('.df-service-card a[data-route="df-caps"]').click();
+check((await page.locator('h1').first().innerText()).includes('CAPS no Distrito Federal'), 'clique CAPS abre módulo próprio');
+check(await page.locator('input[placeholder*="CEP"]').count()===0, 'CAPS DF não exige campo de CEP');
+check(await page.locator('.df-caps-card').count()===19, '19 CAPS do DF aparecem em vez de formulário externo');
+await page.waitForFunction(()=>document.getElementById('dfCapsStatus')?.textContent?.includes('14 de 19'));
+check((await page.locator('.df-caps-coverage').innerText()).includes('PARCIAL'), 'CAPS exige nota de ranking parcial');
+check(await page.locator('.df-caps-group').count()===3, 'CAPS não mistura adulto, AD e CAPSi no ranking');
+check(await page.locator('.df-caps-card .road-metric').count()===14,'14 CAPS geocodificados recebem estimativa de percurso');
+check(await page.locator('.df-caps-card .road-unranked').count()===5,'5 CAPS sem coordenada validada continuam sem classificação falsa');
+const dfCapsFirst=await page.locator('.df-caps-group').evaluateAll(groups=>groups.map(g=>g.querySelector('.df-caps-card')?.dataset.dfCaps));
+check(JSON.stringify(dfCapsFirst)===JSON.stringify(['caps-paranoa','capsad-guara','capsi-asa-norte']), 'menor rota é apresentada separadamente por modalidade');
+check(await page.locator('.df-caps-card .road-best').count()===3, 'há um menor percurso calculado por modalidade, sem classificação global falsa');
+check(await page.locator('.df-caps-card a[href*="google.com/maps/dir"]').count()===38, 'todos os CAPS têm rotas de carro e transporte no mapa');
+check((await page.locator('.df-caps-card').first().locator('a[href*="google.com/maps/dir"]').first().getAttribute('href')).includes('origin='),'GPS autorizado só compõe rota aberta no mapa');
+await goto('df-caps');
+check(await page.locator('.df-caps-card').count()===19,'abrir CAPS diretamente mantém todas as unidades acessíveis sem GPS');
+check((await page.locator('#dfCapsStatus').innerText()).includes('GPS não solicitado'),'abrir link direto de CAPS não pede GPS automaticamente');
+check(!(await page.locator('.df-caps-card').first().locator('a[href*="google.com/maps/dir"]').first().getAttribute('href')).includes('origin='),'sem GPS a rota não contém origem');
+await page.selectOption('#dfCapsKind','ad');
+check(await page.locator('.df-caps-card').count()===7,'filtro CAPS AD mostra exclusivamente os sete CAPS AD');
+check(await page.locator('.df-caps-group').count()===1,'filtro CAPS AD não mistura modalidades');
+await page.selectOption('#dfCapsKind','infanto');
+check(await page.locator('.df-caps-card').count()===4,'filtro CAPSi mostra apenas os quatro infantojuvenis');
+await page.selectOption('#dfCapsKind','adulto');
+check(await page.locator('.df-caps-card').count()===8,'filtro CAPS adulto mostra oito unidades');
+for(const width of [320,390,1024]){
+  await page.setViewportSize({width,height:844});
+  check(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),'CAPS DF sem transbordamento em '+width+'px');
+}
+await page.setViewportSize({width:390,height:844});
 await context.setGeolocation({latitude:-16.6869,longitude:-49.2648});
 await goto();
 
