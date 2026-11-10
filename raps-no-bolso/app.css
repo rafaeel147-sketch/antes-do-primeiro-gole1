@@ -216,3 +216,22 @@ body.high-contrast .priority-service-choice:focus-visible{outline-color:#fff}
   .road-card .hero-actions{display:grid;grid-template-columns:1fr}
   .road-home-shortcut .btn{width:100%}
 }
+
+/* Seleção regional e prévia do Distrito Federal, sem confundir catálogos. */
+.df-region-entry{margin:14px 0 20px;border:2px solid var(--brand-2);background:var(--surface)}
+.df-region-entry h2,.df-region-choice h2{font-size:1.22rem;margin:0 0 10px}
+.df-region-entry .hero-actions{margin:14px 0 8px}
+.df-region-choice{margin:20px 0}
+.df-region-actions{display:flex;gap:12px;flex-wrap:wrap;margin:16px 0}
+.df-services-grid,.df-hospital-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin:14px 0 24px}
+.df-service-card,.df-hospital-card{min-width:0}
+.df-service-card h3,.df-hospital-card h3{margin-top:0}
+.df-pilot-page > h2{margin:25px 0 10px}
+.df-pilot-page .hero-actions{display:flex;gap:10px;flex-wrap:wrap}
+.df-service-card .btn,.df-hospital-card .btn{min-height:44px}
+@media(max-width:720px){
+  .df-services-grid,.df-hospital-list{grid-template-columns:minmax(0,1fr)}
+  .df-region-entry .hero-actions,.df-region-actions{display:grid;grid-template-columns:1fr}
+  .df-pilot-page .hero-actions{display:grid;grid-template-columns:1fr}
+  .df-pilot-page .hero-actions .btn{width:100%;text-align:center}
+}
