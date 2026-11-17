@@ -119,7 +119,7 @@ function pageFor(route){
  '<p class="small">Fonte cadastral: '+ext(CNES,'CNES/GO')+' '+ext(GOV,'Secretaria de Saúde')+'</p></section><div id="anaResults"></div>'+link('anapolis','Voltar para Anápolis','btn secondary')+'</div>';
 }
 Object.keys(FILTERS).forEach(r=>pages[r]=()=>pageFor(r));
-const service=(route,icon,title,description)=>'<article class="panel df-service-card"><h3>'+icon+' '+esc(title)+'</h3><p>'+esc(description)+'</p>'+link(route,'Abrir atendimento','btn')+'</article>';
+const service=(route,icon,title,description)=>'<article class="panel df-service-card"><h3>'+icon+' '+esc(title)+'</h3><p>'+esc(description)+'</p>'+(FILTERS[route]?'<p class="small">Ao tocar, o navegador pedirá permissão de GPS. Se autorizado, sua posição será enviada temporariamente ao Valhalla para calcular rotas. Você pode recusar.</p>':'')+link(route,'Abrir atendimento','btn')+'</article>';
 pages.anapolis=()=>'<div class="page df-pilot-page ana-home">'+pageHead('Encontrar atendimento em Anápolis','Escolha o tipo de serviço. Sem CPF, CEP ou cadastro; GPS opcional e rotas por endereço.','Anápolis — novo piloto')+emergency()+
  '<div class="df-services-grid">'+
  service('ana-caps','💙','CAPS / CAPS AD / CAPSi','Saúde mental, álcool e outras drogas, crianças e adolescentes. A comparação respeita cada modalidade.')+
@@ -155,7 +155,9 @@ pages.inicio=()=>{
  return t.innerHTML;
 };
 const prevRegion=pages['selecionar-regiao'];
-pages['selecionar-regiao']=()=>{const t=document.createElement('template');t.innerHTML=prevRegion();t.content.querySelector('.df-region-choice .hero-actions')?.insertAdjacentHTML('beforeend',link('anapolis','Anápolis — piloto','btn'));return t.innerHTML;};
+pages['selecionar-regiao']=()=>{const t=document.createElement('template');t.innerHTML=prevRegion();t.content.querySelector('.df-region-choice .df-region-actions')?.insertAdjacentHTML('beforeend',link('anapolis','Anápolis — piloto','btn'));return t.innerHTML;};
+const prevRenderNav=renderNav;
+renderNav=function(){prevRenderNav();const nav=document.getElementById('drawerNav');if(nav&&!nav.querySelector('[data-route="anapolis"]'))nav.insertAdjacentHTML('beforeend','<a class="drawer-link" data-route="anapolis" href="?p=anapolis">📍 Anápolis</a><a class="drawer-link" data-route="consultorio-na-rua" href="?p=consultorio-na-rua">🤝 Consultório na Rua</a>');};
 const prevDf=pages['df-servicos'];
 pages['df-servicos']=()=>{const t=document.createElement('template');t.innerHTML=prevDf();const grid=t.content.querySelector('.df-services-grid');if(grid)grid.insertAdjacentHTML('afterend','<section class="panel"><h2>🤝 Consultório na Rua — DF</h2><p>Saúde para quem está em situação de rua. Equipes itinerantes.</p>'+link('consultorio-rua-df','Como acionar o serviço','btn')+'</section>');return t.innerHTML;};
 document.addEventListener('click',e=>{
