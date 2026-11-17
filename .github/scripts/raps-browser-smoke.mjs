@@ -66,6 +66,28 @@ check((await page.locator('.ana-unit').first().innerText()).includes('Viver'),'C
 await goto('ana-ubs');
 await page.waitForSelector('.ana-unit');
 check(await page.locator('.ana-unit').count()===52,'UBS/USF Anápolis funcionam sem GPS');
+// Teste determinístico do roteador: posição fictícia e resposta interceptada, sem envio real de GPS.
+await goto('anapolis');
+await context.setGeolocation({latitude:-16.315,longitude:-48.95});
+let anaMatrixRequests=0;
+const anaRoutePattern='https://valhalla1.openstreetmap.de/sources_to_targets?*';
+await page.route(anaRoutePattern,async route=>{
+ const req=JSON.parse(new URL(route.request().url()).searchParams.get('json'));
+ if(req.id!=='raps-no-bolso-anapolis')return route.continue();
+ anaMatrixRequests++;
+ const cells=req.targets.map((p,i)=>({distance:i===0?4.8:1.2,time:i===0?600:180}));
+ await route.fulfill({status:200,contentType:'application/json',headers:{'Access-Control-Allow-Origin':'*'},body:JSON.stringify({sources_to_targets:[cells]})});
+});
+await page.locator('.ana-home a[data-route="ana-upas"]').click();
+await page.waitForFunction(()=>document.getElementById('anaStatus')?.textContent.includes('3 de 4 trajetos calculados'));
+check(anaMatrixRequests===1,'clique em pronto atendimento solicita GPS e consulta matriz viária simulada');
+check((await page.locator('#anaResults .panel.soft').innerText()).includes('PARCIAL'),'UPA provisória sem coordenada antiga mantém resultado parcial');
+check(await page.locator('.ana-unit .road-metric').count()===3,'três referências têm rota calculada e a UPA provisória não recebe distância falsa');
+check(await page.locator('.ana-unit[data-ana-unit="7529368"] .road-unranked').count()===1,'UPA provisória continua disponível por endereço');
+check(await page.locator('.ana-unit a[href*="origin="]').count()>=1,'rotas após GPS incluem origem autorizada');
+await page.unroute(anaRoutePattern);
+await context.setGeolocation({latitude:-16.6869,longitude:-49.2648});
+
 await goto('consultorio-na-rua');
 check(await page.locator('.df-service-card').count()===3,'Consultório na Rua nas três regiões');
 await goto('consultorio-rua-anapolis');
