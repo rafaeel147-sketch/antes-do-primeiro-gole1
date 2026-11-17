@@ -76,7 +76,7 @@ await page.route(anaRoutePattern,async route=>{
  if(req.id!=='raps-no-bolso-anapolis')return route.continue();
  anaMatrixRequests++;
  const cells=req.targets.map((p,i)=>({distance:i===0?4.8:1.2,time:i===0?600:180}));
- await route.fulfill({status:200,contentType:'application/json',headers:{'Access-Control-Allow-Origin':'*'},body:JSON.stringify({sources_to_targets:[cells]})});
+ await route.fulfill({status:200,contentType:'application/json',headers:{'Access-Control-Allow-Origin':'*','Access-Control-Allow-Headers':'x-client-id','Access-Control-Allow-Methods':'GET, OPTIONS'},body:JSON.stringify({sources_to_targets:[cells]})});
 });
 await page.locator('.ana-home a[data-route="ana-upas"]').click();
 await page.waitForFunction(()=>document.getElementById('anaStatus')?.textContent.includes('3 de 4 trajetos calculados'));
@@ -95,7 +95,7 @@ check(await page.locator('a[href="tel:6226040437"]').count()===1,'contato da USF
 check((await page.locator('#conteudo').innerText()).includes('não até a equipe'),'não confunde base com localização da equipe itinerante');
 check((await page.locator('#conteudo').innerText()).includes('pendente'),'telefone histórico e horário não apresentados como atuais');
 await goto('consultorio-rua-goiania');
-check(await page.locator('a[data-route="ubs-goiania"]').count()===1,'Consultório na Rua de Goiânia aponta para UBS');
+check(await page.locator('#conteudo a[data-route="ubs-goiania"]').count()===1,'Consultório na Rua de Goiânia aponta para UBS');
 await goto('consultorio-rua-df');
 check(await page.locator('a[href="tel:6134494102"]').count()===1,'DF apresenta contato de orientação da gerência');
 await goto();
