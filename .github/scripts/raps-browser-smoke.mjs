@@ -44,6 +44,41 @@ await goto();
 await page.waitForSelector('#speakPage');
 await page.waitForFunction(() => Array.isArray(window.__rapsAddonLoadFailures));
 
+check(await page.locator('.df-region-entry a[data-route="anapolis"]').count()===1,'capa oferece Anápolis');
+check(await page.locator('a[data-route="consultorio-na-rua"]').count()>=1,'Consultório na Rua disponível na capa');
+await goto('selecionar-regiao');
+check(await page.locator('.df-region-choice a[data-route="anapolis"]').count()===1,'seletor inclui Anápolis');
+await goto('anapolis');
+check(await page.locator('.ana-home .df-service-card').count()===6,'Anápolis tem seis acessos por tipo');
+check(await page.locator('.ana-home a[data-route="consultorio-rua-anapolis"]').count()===1,'Anápolis inclui Consultório na Rua');
+const anaCatalog=await page.evaluate(()=>window.RAPSAnapolisTest.catalog());
+check(anaCatalog.filter(x=>x.kind==='ubs').length===52,'52 registros da atenção básica importados do CNES');
+check(anaCatalog.filter(x=>['adulto','ad','infanto'].includes(x.kind)).length===3,'três CAPS sem duplicação de CNES');
+check(anaCatalog.some(x=>x.id==='7529368'&&!x.geo&&x.address.includes('Estrela do Sul')),'UPA Alair Mafra usa sede provisória e não geocódigo antigo');
+check(anaCatalog.some(x=>x.id==='florescer'&&x.address.includes('1113')),'Espaço Florescer usa novo endereço');
+await goto('ana-caps');
+await page.waitForSelector('.ana-unit');
+check(await page.locator('.ana-unit').count()===3,'CAPS de Anápolis listados sem GPS');
+check(await page.locator('input[placeholder*="CEP"]').count()===0,'Anápolis sem CEP obrigatório');
+await page.selectOption('#anaKind','ad');
+check(await page.locator('.ana-unit').count()===1,'filtro CAPS AD de Anápolis');
+check((await page.locator('.ana-unit').first().innerText()).includes('Viver'),'CAPS AD Viver localizado no diretório');
+await goto('ana-ubs');
+await page.waitForSelector('.ana-unit');
+check(await page.locator('.ana-unit').count()===52,'UBS/USF Anápolis funcionam sem GPS');
+await goto('consultorio-na-rua');
+check(await page.locator('.df-service-card').count()===3,'Consultório na Rua nas três regiões');
+await goto('consultorio-rua-anapolis');
+check(await page.locator('a[href="tel:6226040437"]').count()===1,'contato da USF São Carlos disponível');
+check((await page.locator('#conteudo').innerText()).includes('não até a equipe'),'não confunde base com localização da equipe itinerante');
+check((await page.locator('#conteudo').innerText()).includes('pendente'),'telefone histórico e horário não apresentados como atuais');
+await goto('consultorio-rua-goiania');
+check(await page.locator('a[data-route="ubs-goiania"]').count()===1,'Consultório na Rua de Goiânia aponta para UBS');
+await goto('consultorio-rua-df');
+check(await page.locator('a[href="tel:6134494102"]').count()===1,'DF apresenta contato de orientação da gerência');
+await goto();
+
+
 // Prévia DF: região explícita, sem GPS automático, sem ranking inventado.
 check(await page.locator('.df-region-entry a[data-route="df-servicos"]').count() === 1, 'capa inclui entrada explícita do Distrito Federal');
 check(await page.locator('.df-region-entry').innerText().then(s=>s.includes('Goiânia')), 'capa preserva Goiânia como piloto principal');
